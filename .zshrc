@@ -1,0 +1,88 @@
+export ZSH=/Users/mikamitaiga/.oh-my-zsh
+
+ZSH_THEME="wedisagree"
+
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
+# コマンドの引数やパス名を途中まで入力して <Tab> を押すといい感じに補完してくれる
+# 例： `cd path/to/<Tab>`, `ls -<Tab>`
+autoload -U compinit; compinit
+# 入力したコマンドが存在せず、かつディレクトリ名と一致するなら、ディレクトリに cd する
+# 例： /usr/bin と入力すると /usr/bin ディレクトリに移動
+setopt auto_cd
+
+## cd XXX
+alias d='cd ~/Desktop'
+alias dotfiles='cd ~/dotfilesi'
+
+## open XXX
+alias od='open ~/Desktop'
+
+#rbenv
+export PATH="$HOME/.rbenv/bin:$PATH"
+if which rbenv > /dev/null; then
+    eval "$(rbenv init -)"
+fi
+
+#pyenv
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+#goenv
+export PATH="$HOME/.goenv/bin:$PATH"
+eval "$(goenv init -)"
+export GOPATH="$HOME/go"
+export PATH="$GOPATH/bin:$PATH"
+
+#peco(golang)
+bindkey '^]' peco-src
+
+function peco-src() {
+  local src=$(ghq list --full-path | peco --query "$LBUFFER")
+  if [ -n "$src" ]; then
+    BUFFER="cd $src"
+    zle accept-line
+  fi
+  zle -R -c
+}
+zle -N peco-src
+
+
+#yarn
+export PATH="$HOME/.yarn/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/usr/local/google-cloud-sdk/path.zsh.inc' ]; then source '/usr/local/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/usr/local/google-cloud-sdk/completion.zsh.inc' ]; then source '/usr/local/google-cloud-sdk/completion.zsh.inc'; fi
+
+
+# peco
+function peco-select-history() {
+    local tac
+    if which tac > /dev/null; then
+        tac="tac"
+    else
+        tac="tail -r"
+    fi
+    BUFFER=$(\history -n 1 | \
+        eval $tac | \
+        peco --query "$LBUFFER")
+    CURSOR=$#BUFFER
+    zle clear-screen
+}
+zle -N peco-select-history
+bindkey '^r' peco-select-history
+
+# ヒストリ(履歴)を保存、数を増やす
+HISTFILE=~/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+
+## direnv
+export EDITOR=vim
+eval "$(direnv hook zsh)"
