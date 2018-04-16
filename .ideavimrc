@@ -22,8 +22,7 @@ set smartcase
 set incsearch " インクリメントサーチ 1ッモジ入力ごとに検索を行う
 
 " カーソル位置が右下に表示される
-set ruler
-" 行番号を付ける
+set ruler " 行番号を付ける
 set number
 " コマンドライン補完が強力になる
 set wildmenu
@@ -68,7 +67,10 @@ imap { {}<left>
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
 " }}}
 
-
+" インサートモードで移動
+imap <C-h> <left>
+imap <C-l> <Right>
+imap <C-k> <Up>
 "----------------------------------------------------------
 "ここからプラグイン
 if has('vim_starting')
