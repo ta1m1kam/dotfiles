@@ -15,7 +15,8 @@ setopt auto_cd
 
 ## cd XXX
 alias d='cd ~/Desktop'
-alias dotfiles='cd ~/dotfilesi'
+alias dotfiles='cd ~/dotfiles'
+alias K='cd ~/Karappo'
 
 ## open XXX
 alias od='open ~/Desktop'

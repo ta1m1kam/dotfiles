@@ -34,13 +34,13 @@ set clipboard=unnamed
 " 改行時にインデントを引き継いで改行する
 set autoindent
 " インデントにつかわれる空白の数
-set shiftwidth=4
+set shiftwidth=2
 " <Tab>押下時の空白数
-set softtabstop=4
+set softtabstop=2
 " <Tab>押下時に<Tab>ではなく、ホワイトスペースを挿入する
 set expandtab
 " <Tab>が対応する空白の数
-set tabstop=4
+set tabstop=2
 set listchars=tab:>-,trail:.  " タブを >--- 半スペを . で表示する
 
 " インクリメント、デクリメントを16進数にする(0x0とかにしなければ10進数です。007をインクリメントすると010になるのはデフォルト設定が8進数のため)
