@@ -41,6 +41,9 @@ export PATH="$GOPATH/bin:$PATH"
 #peco(golang)
 bindkey '^]' peco-src
 
+# psql
+export PGDATA=/usr/local/var/postgres
+
 function peco-src() {
   local src=$(ghq list --full-path | peco --query "$LBUFFER")
   if [ -n "$src" ]; then
@@ -54,6 +57,9 @@ zle -N peco-src
 
 #yarn
 export PATH="$HOME/.yarn/bin:$PATH"
+
+# openssl for crystal
+export PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/usr/local/google-cloud-sdk/path.zsh.inc' ]; then source '/usr/local/google-cloud-sdk/path.zsh.inc'; fi
@@ -87,3 +93,5 @@ SAVEHIST=100000
 ## direnv
 export EDITOR=vim
 eval "$(direnv hook zsh)"
+export PATH="$HOME/.anyenv/bin:$PATH"
+eval "$(anyenv init -)"
