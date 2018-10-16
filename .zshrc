@@ -16,7 +16,8 @@ setopt auto_cd
 ## cd XXX
 alias d='cd ~/Desktop'
 alias dotfiles='cd ~/dotfiles'
-alias K='cd ~/Karappo'
+alias K='cd ~/workspace/Karappo'
+alias W='cd ~/workspace'
 
 ## open XXX
 alias od='open ~/Desktop'
@@ -26,11 +27,6 @@ export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then
     eval "$(rbenv init -)"
 fi
-
-#pyenv
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 #goenv
 export PATH="$HOME/.goenv/bin:$PATH"
@@ -93,5 +89,19 @@ SAVEHIST=100000
 ## direnv
 export EDITOR=vim
 eval "$(direnv hook zsh)"
-export PATH="$HOME/.anyenv/bin:$PATH"
-eval "$(anyenv init -)"
+export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
+
+## pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+## anyenv
+#export PATH="$HOME/.anyenv/bin:$PATH"
+#eval "$(anyenv init -)"
+
+## ndenv 
+export PATH="$HOME/.ndenv/bin:$PATH"
+eval "$(ndenv init -)"
