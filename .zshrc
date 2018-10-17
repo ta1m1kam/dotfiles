@@ -1,11 +1,12 @@
 export ZSH=/Users/mikamitaiga/.oh-my-zsh
 
-ZSH_THEME="wedisagree"
+ZSH_THEME="amuse"
 
 plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+export LC_CTYPE=UTF-8
 # コマンドの引数やパス名を途中まで入力して <Tab> を押すといい感じに補完してくれる
 # 例： `cd path/to/<Tab>`, `ls -<Tab>`
 autoload -U compinit; compinit
