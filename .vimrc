@@ -49,31 +49,51 @@ imap <C-h> <left>
 imap <C-l> <Right>
 imap <C-k> <Up>
 "----------------------------------------------------------
-"ここからプラグイン
-if has('vim_starting')
-    " 初回起動時のみruntimepathにNeoBundleのパスを指定する
-    set runtimepath+=~/.vim/bundle/neobundle.vim/
+"ここからプラグイン vim-plugに乗り換え
+call plug#begin('~/.vim/plugged')
 
-    " NeoBundleが未インストールであればgit cloneする・・・・・・①
-    if !isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
-        echo "install NeoBundle..."
-        :call system("git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim")
-    endif
-endif
-
-call neobundle#begin(expand('~/.vim/bundle/'))
-
-" インストールするVimプラグインを以下に記述
-" NeoBundle自身を管理
-NeoBundleFetch 'Shougo/neobundle.vim'
 "----------------------------------------------------------
 " ここに追加したいVimプラグインを記述する・・・・・・②
 " ファイルをtree表示してくれる
-NeoBundle 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree'
 nnoremap <silent><C-e> :NERDTreeToggle<CR>
 " unite.vim
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/neomru.vim'
+Plug 'Shougo/unite.vim'
+Plug 'Shougo/neomru.vim'
+" ステータスラインの表示内容強化
+Plug 'itchyny/lightline.vim'
+" 末尾の全角と半角の空白文字を赤くハイライト
+Plug 'bronson/vim-trailing-whitespace'
+" インデントの可視化
+Plug 'Yggdroot/indentLine'
+" TypeScriptプラグイン
+Plug 'leafgarland/typescript-vim'
+
+" 多機能セレクタ
+Plug 'ctrlpvim/ctrlp.vim'
+" CtrlPの拡張プラグイン. 関数検索
+Plug 'tacahiroy/ctrlp-funky'
+" CtrlPの拡張プラグイン. コマンド履歴検索
+Plug 'suy/vim-ctrlp-commandline'
+" CtrlPの検索にagを使う
+Plug 'rking/ag.vim'
+
+if has('lua') " lua機能が有効になっている場合・・・・・・①
+    " コードの自動補完
+    Plug 'Shougo/neocomplete.vim'
+    " スニペットの補完機能
+    Plug 'Shougo/neosnippet'
+    " スニペット集
+    Plug 'Shougo/neosnippet-snippets'
+endif
+
+
+"----------------------------------------------------------
+call plug#end()
+
+" ファイルタイプ別のVimプラグイン/インデントを有効にする
+filetype plugin indent on
+
 """"""""""""""""""""""""""""""
 " Unit.vimの設定
 """"""""""""""""""""""""""""""
@@ -96,39 +116,6 @@ au FileType unite inoremap <silent> <buffer> <expr> <C-K> unite#do_action('vspli
 " ESCキーを2回押すと終了する
 au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
 au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
-" ステータスラインの表示内容強化
-NeoBundle 'itchyny/lightline.vim'
-" 末尾の全角と半角の空白文字を赤くハイライト
-NeoBundle 'bronson/vim-trailing-whitespace'
-" インデントの可視化
-NeoBundle 'Yggdroot/indentLine'
-" TypeScriptプラグイン
-NeoBundle 'leafgarland/typescript-vim'
-if has('lua') " lua機能が有効になっている場合・・・・・・①
-    " コードの自動補完
-    NeoBundle 'Shougo/neocomplete.vim'
-    " スニペットの補完機能
-    NeoBundle "Shougo/neosnippet"
-    " スニペット集
-    NeoBundle 'Shougo/neosnippet-snippets'
-endif
-" 多機能セレクタ
-NeoBundle 'ctrlpvim/ctrlp.vim'
-" CtrlPの拡張プラグイン. 関数検索
-NeoBundle 'tacahiroy/ctrlp-funky'
-" CtrlPの拡張プラグイン. コマンド履歴検索
-NeoBundle 'suy/vim-ctrlp-commandline'
-" CtrlPの検索にagを使う
-NeoBundle 'rking/ag.vim'
-
-"----------------------------------------------------------
-call neobundle#end()
-
-" ファイルタイプ別のVimプラグイン/インデントを有効にする
-filetype plugin indent on
-
-" 未インストールのVimプラグインがある場合、インストールするかどうかを尋ねてくれるようにする設定・・・・・・③
-NeoBundleCheck
 
 "----------------------------------------------------------
 " molokaiの設定
@@ -146,27 +133,6 @@ set showcmd " 打ったコマンドをステータスラインの下に表示
 
 "----------------------------------------------------------
 " neocomplete・neosnippetの設定
-"----------------------------------------------------------
-if neobundle#is_installed('neocomplete.vim')
-    " Vim起動時にneocompleteを有効にする
-    let g:neocomplete#enable_at_startup = 1
-    " smartcase有効化. 大文字が入力されるまで大文字小文字の区別を無視する
-    let g:neocomplete#enable_smart_case = 1
-    " 3文字以上の単語に対して補完を有効にする
-    let g:neocomplete#min_keyword_length = 3
-    " 区切り文字まで補完する
-    let g:neocomplete#enable_auto_delimiter = 1
-    " 1文字目の入力から補完のポップアップを表示
-    let g:neocomplete#auto_completion_start_length = 1
-    " バックスペースで補完のポップアップを閉じる
-    inoremap <expr><BS> neocomplete#smart_close_popup()."<C-h>"
-
-    " エンターキーで補完候補の確定. スニペットの展開もエンターキーで確定・・・・・・②
-    imap <expr><CR> neosnippet#expandable() ? "<Plug>(neosnippet_expand_or_jump)" : pumvisible() ? "<C-y>" : "<CR>"
-    " タブキーで補完候補の選択. スニペット内のジャンプもタブキーでジャンプ・・・・・・③
-    imap <expr><TAB> pumvisible() ? "<C-n>" : neosnippet#jumpable() ? "<Plug>(neosnippet_expand_or_jump)" : "<TAB>"
-endif
-
 "----------------------------------------------------------
 " CtrlPの設定
 "----------------------------------------------------------
