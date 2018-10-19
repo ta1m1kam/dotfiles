@@ -48,6 +48,7 @@ nmap <Esc><Esc> :nohlsearch<CR><Esc>
 imap <C-h> <left>
 imap <C-l> <Right>
 imap <C-k> <Up>
+
 "----------------------------------------------------------
 "ここからプラグイン vim-plugに乗り換え
 call plug#begin('~/.vim/plugged')
@@ -77,7 +78,8 @@ Plug 'tacahiroy/ctrlp-funky'
 Plug 'suy/vim-ctrlp-commandline'
 " CtrlPの検索にagを使う
 Plug 'rking/ag.vim'
-
+" submode
+Plug 'kana/vim-submode'
 if has('lua') " lua機能が有効になっている場合・・・・・・①
     " コードの自動補完
     Plug 'Shougo/neocomplete.vim'
@@ -155,3 +157,42 @@ if executable('ag') " agが使える環境の場合
   let g:ctrlp_user_command='ag %s -i --hidden -g ""' " 「ag」の検索設定
 endif
 
+nnoremap s <Nop>
+nnoremap sj <C-w>j
+nnoremap sk <C-w>k
+nnoremap sl <C-w>l
+nnoremap sh <C-w>h
+nnoremap sJ <C-w>J
+nnoremap sK <C-w>K
+nnoremap sL <C-w>L
+nnoremap sH <C-w>H
+nnoremap sn gt
+nnoremap sp gT
+nnoremap sr <C-w>r
+nnoremap s= <C-w>=
+nnoremap sw <C-w>w
+nnoremap so <C-w>_<C-w>|
+nnoremap sO <C-w>=
+nnoremap sN :<C-u>bn<CR>
+nnoremap sP :<C-u>bp<CR>
+nnoremap st :<C-u>tabnew<CR>
+nnoremap sT :<C-u>Unite tab<CR>
+nnoremap ss :<C-u>sp<CR>
+nnoremap sv :<C-u>vs<CR>
+nnoremap sq :<C-u>q<CR>
+nnoremap sQ :<C-u>bd<CR>
+nnoremap sb :<C-u>Unite buffer_tab -buffer-name=file<CR>
+nnoremap sB :<C-u>Unite buffer -buffer-name=file<CR>
+
+call submode#enter_with('bufmove', 'n', '', 's>', '<C-w>>')
+call submode#enter_with('bufmove', 'n', '', 's<', '<C-w><')
+call submode#enter_with('bufmove', 'n', '', 's+', '<C-w>+')
+call submode#enter_with('bufmove', 'n', '', 's-', '<C-w>-')
+call submode#map('bufmove', 'n', '', '>', '<C-w>>')
+call submode#map('bufmove', 'n', '', '<', '<C-w><')
+call submode#map('bufmove', 'n', '', '+', '<C-w>+')
+call submode#map('bufmove', 'n', '', '-', '<C-w>-')
+
+" ターミナルモード
+nnoremap tm :belowright :terminal<CR>
+tnoremap <C-Q> <C-W>N
