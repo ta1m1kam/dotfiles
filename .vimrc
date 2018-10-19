@@ -6,54 +6,31 @@ source $VIMRUNTIME/macros/matchit.vim
 let b:match_ignorecase = 1
 " }}}
 
-" ターミナルの右端で文字を折り返さない
-set nowrap
-
-" tempファイルを作らない。編集中に電源落ちまくるし、とかいう人はコメントアウトで
-set noswapfile
-
-" ハイライトサーチを有効にする。文字列検索は /word とか * ね
-set hlsearch
-" 大文字小文字を区別しない(検索時)
-set ignorecase
-" ただし大文字を含んでいた場合は大文字小文字を区別する(検索時)
-set smartcase
-
+set nowrap  " ターミナルの右端で文字を折り返さない
+set noswapfile " tempファイルを作らない。編集中に電源落ちまくるし、とかいう人はコメントアウトで
+set hlsearch " ハイライトサーチを有効にする。文字列検索は /word とか * ね
+set ignorecase " 大文字小文字を区別しない(検索時)
+set smartcase " ただし大文字を含んでいた場合は大文字小文字を区別する(検索時)
 set incsearch " インクリメントサーチ 1ッモジ入力ごとに検索を行う
-
-" カーソル位置が右下に表示される
-set ruler " 行番号を付ける
-set number
-" コマンドライン補完が強力になる
-set wildmenu
-" コマンドを画面の最下部に表示する
-set showcmd
-" クリップボードを共有する(設定しないとvimとのコピペが面倒です)
-set clipboard=unnamed
-
-" 改行時にインデントを引き継いで改行する
-set autoindent
-" インデントにつかわれる空白の数
-set shiftwidth=2
-" <Tab>押下時の空白数
-set softtabstop=2
-" <Tab>押下時に<Tab>ではなく、ホワイトスペースを挿入する
-set expandtab
-" <Tab>が対応する空白の数
-set tabstop=2
+set ruler " カーソル位置が右下に表示される
+set number " 行番号を付ける
+set wildmenu " コマンドライン補完が強力になる
+set showcmd " コマンドを画面の最下部に表示する
+set clipboard=unnamed  " クリップボードを共有する(設定しないとvimとのコピペが面倒です)
+set autoindent " 改行時にインデントを引き継いで改行する
+set shiftwidth=2 " インデントにつかわれる空白の数
+set softtabstop=2 " <Tab>押下時の空白数 
+set expandtab " <Tab>押下時に<Tab>ではなく、ホワイトスペースを挿入する
+set tabstop=2 " <Tab>が対応する空白の数 
 set listchars=tab:>-,trail:.  " タブを >--- 半スペを . で表示する
-
 " インクリメント、デクリメントを16進数にする(0x0とかにしなければ10進数です。007をインクリメントすると010になるのはデフォルト設定が8進数のため)
 set nf=hex
 " マウス使えます
 set mouse=a
-
 set whichwrap=b,s,h,l,<,>,[,],~ " カーソルの左右移動で行末から次の行の行頭への移動が可能になる
 set cursorline " カーソルラインをハイライト
-
 set showmatch " 括弧の対応関係を一瞬表示する
 source $VIMRUNTIME/macros/matchit.vim " Vimの「%」を拡張する
-
 set history=5000 " 保存するコマンド履歴の数
 
 " インサートモードの時に C-j でノーマルモードに戻る
@@ -125,6 +102,8 @@ NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'bronson/vim-trailing-whitespace'
 " インデントの可視化
 NeoBundle 'Yggdroot/indentLine'
+" TypeScriptプラグイン
+NeoBundle 'leafgarland/typescript-vim'
 if has('lua') " lua機能が有効になっている場合・・・・・・①
     " コードの自動補完
     NeoBundle 'Shougo/neocomplete.vim'
@@ -141,6 +120,7 @@ NeoBundle 'tacahiroy/ctrlp-funky'
 NeoBundle 'suy/vim-ctrlp-commandline'
 " CtrlPの検索にagを使う
 NeoBundle 'rking/ag.vim'
+
 "----------------------------------------------------------
 call neobundle#end()
 
@@ -163,7 +143,6 @@ syntax enable " 構文に色を付ける
 set laststatus=2 " ステータスラインを常に表示
 set showmode " 現在のモードを表示
 set showcmd " 打ったコマンドをステータスラインの下に表示
-set ruler " ステータスラインの右側にカーソルの現在位置を表示する
 
 "----------------------------------------------------------
 " neocomplete・neosnippetの設定
