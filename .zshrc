@@ -19,6 +19,7 @@ alias d='cd ~/Desktop'
 alias dotfiles='cd ~/dotfiles'
 alias K='cd ~/workspace/Karappo'
 alias W='cd ~/workspace'
+alias R='cd ~/research'
 
 ## open XXX
 alias od='open ~/Desktop'
