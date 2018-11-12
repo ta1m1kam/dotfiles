@@ -33,7 +33,7 @@ fi
 #goenv
 export PATH="$HOME/.goenv/bin:$PATH"
 eval "$(goenv init -)"
-export GOPATH="$HOME/go"
+export GOPATH="$HOME/workspace/go"
 export PATH="$GOPATH/bin:$PATH"
 
 #peco(golang)

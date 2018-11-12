@@ -193,6 +193,9 @@ call submode#map('bufmove', 'n', '', '<', '<C-w><')
 call submode#map('bufmove', 'n', '', '+', '<C-w>+')
 call submode#map('bufmove', 'n', '', '-', '<C-w>-')
 
+" タブで引数ファイルを開く
+nnoremap <silent> <leader>te :<c-u>tabedit<cr>
+
 " ターミナルモード
 nnoremap tm :belowright :terminal<CR>
 tnoremap <C-Q> <C-W>N
