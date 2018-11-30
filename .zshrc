@@ -24,6 +24,10 @@ alias R='cd ~/research'
 ## open XXX
 alias od='open ~/Desktop'
 
+## 便利系ailias
+alias cl='clear'
+
+
 #rbenv
 export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then
