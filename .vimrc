@@ -32,7 +32,7 @@ set cursorline " カーソルラインをハイライト
 set showmatch " 括弧の対応関係を一瞬表示する
 source $VIMRUNTIME/macros/matchit.vim " Vimの「%」を拡張する
 set history=5000 " 保存するコマンド履歴の数
-
+set backspace=indent,eol,start
 " インサートモードの時に C-j でノーマルモードに戻る
 imap <C-j> <esc>
 " [ って打ったら [] って入力されてしかも括弧の中にいる(以下同様)
