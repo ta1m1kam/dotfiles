@@ -3,6 +3,3 @@
 	email = mikamimikami60@gmail.com
 [color]
 	ui = true
-[core]
-  excludesfile = /Users/mikamitaiga/.gitignore_global
-
