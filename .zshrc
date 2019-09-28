@@ -56,10 +56,16 @@ if which rbenv > /dev/null; then
 fi
 
 #goenv
+# goenvを利用する時
 export PATH="$HOME/.goenv/bin:$PATH"
 eval "$(goenv init -)"
 export GOPATH="$HOME/workspace/go"
 export PATH="$GOPATH/bin:$PATH"
+export GO111MODULE=on
+
+# brew go
+# export GOROOT=$HOME/go
+# export PATH=$PATH:$GOROOT/bin
 
 #peco(golang)
 bindkey '^]' peco-src
@@ -132,3 +138,10 @@ fi
 ## ndenv 
 export PATH="$HOME/.ndenv/bin:$PATH"
 eval "$(ndenv init -)"
+
+## nodenv
+eval "$(nodenv init -)"
+
+## flutter
+export PATH="$PATH:$HOME/flutter/flutter/bin"
+
