@@ -4,5 +4,4 @@
 [color]
 	ui = true
 [core]
-  excludesfile = /Users/mikamitaiga/.gitignore_global
-
+    excludesfile = /Users/mikamitaiga/.gitignore_global
