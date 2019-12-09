@@ -1,5 +1,23 @@
-set encoding=utf-8
-scriptencoding utf-8
+"--------------------------------------------------------------
+"          shell                                            <<<
+"--------------------------------------------------------------
+set shell=/bin/zsh
+" <<<
+
+"--------------------------------------------------------------
+"          encoding                                         <<<
+"--------------------------------------------------------------
+set encoding=utf8
+scriptencoding utf8
+set termencoding=utf8
+set fileencodings=utf-8,ucs-boms,euc-jp,ep932
+set fileformats=unix,dos,mac
+set ambiwidth=double
+set nobomb
+
+"--------------------------------------------------------------
+"          Vim Options                                      <<<
+"--------------------------------------------------------------
 " matchit {{{
 " if や for などの文字にも%で移動できるようになる
 source $VIMRUNTIME/macros/matchit.vim
@@ -18,6 +36,8 @@ endif
 
 set nowrap  " ターミナルの右端で文字を折り返さない
 set noswapfile " tempファイルを作らない。編集中に電源落ちまくるし、とかいう人はコメントアウトで
+set belloff=all " ビーブ音を消す
+set title " タイトルを付ける
 set hlsearch " ハイライトサーチを有効にする。文字列検索は /word とか * ね
 set ignorecase " 大文字小文字を区別しない(検索時)
 set smartcase " ただし大文字を含んでいた場合は大文字小文字を区別する(検索時)
@@ -28,10 +48,6 @@ set wildmenu " コマンドライン補完が強力になる
 set showcmd " コマンドを画面の最下部に表示する
 set clipboard=unnamed  " クリップボードを共有する(設定しないとvimとのコピペが面倒です)
 set autoindent " 改行時にインデントを引き継いで改行する
-set shiftwidth=2 " インデントにつかわれる空白の数
-set softtabstop=2 " <Tab>押下時の空白数 
-set expandtab " <Tab>押下時に<Tab>ではなく、ホワイトスペースを挿入する
-set tabstop=2 " <Tab>が対応する空白の数 
 set listchars=tab:>-,trail:.  " タブを >--- 半スペを . で表示する
 " インクリメント、デクリメントを16進数にする(0x0とかにしなければ10進数です。007をインクリメントすると010になるのはデフォルト設定が8進数のため)
 set nf=hex
@@ -43,21 +59,17 @@ set showmatch " 括弧の対応関係を一瞬表示する
 source $VIMRUNTIME/macros/matchit.vim " Vimの「%」を拡張する
 set history=5000 " 保存するコマンド履歴の数
 set backspace=indent,eol,start
-" インサートモードの時に C-j でノーマルモードに戻る
-imap <C-j> <esc>
-" [ って打ったら [] って入力されてしかも括弧の中にいる(以下同様)
-imap [ []<left>
-imap ( ()<left>
-imap { {}<left>
 
-" ２回esc を押したら検索のハイライトをヤメる
-nmap <Esc><Esc> :nohlsearch<CR><Esc>
-" }}}
+"--------------------------------------------------------------
+"          indent                                           <<<
+"--------------------------------------------------------------
+set expandtab " <Tab>押下時に<Tab>ではなく、ホワイトスペースを挿入する
+set tabstop=2 " <Tab>が対応する空白の数
+set softtabstop=2 " <Tab>押下時の空白数
+set shiftwidth=2 " インデントにつかわれる空白の数
+set smartindent " 自動インデント
 
-" インサートモードで移動
-imap <C-h> <left>
-imap <C-l> <Right>
-imap <C-k> <Up>
+
 
 "----------------------------------------------------------
 "ここからプラグイン vim-plugに乗り換え
@@ -90,6 +102,10 @@ Plug 'suy/vim-ctrlp-commandline'
 Plug 'rking/ag.vim'
 " submode
 Plug 'kana/vim-submode'
+" fzf
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
+
 if has('lua') " lua機能が有効になっている場合・・・・・・①
     " コードの自動補完
     Plug 'Shougo/neocomplete.vim'
@@ -112,7 +128,7 @@ filetype plugin indent on
 " 入力モードで開始する
 let g:unite_enable_start_insert=1
 " バッファ一覧
-noremap <C-P> :Unite buffer<CR>
+" noremap <C-P> :Unite buffer<CR>
 " ファイル一覧
 noremap <C-N> :Unite -buffer-name=file file<CR>
 " 最近使ったファイルの一覧
@@ -167,41 +183,65 @@ if executable('ag') " agが使える環境の場合
   let g:ctrlp_user_command='ag %s -i --hidden -g ""' " 「ag」の検索設定
 endif
 
-nnoremap s <Nop>
+"--------------------------------------------------------------
+"          key bind                                         <<<
+"--------------------------------------------------------------
+" インサートモードの時に C-j でノーマルモードに戻る
+" 括弧の補完
+" [ って打ったら [] って入力されてしかも括弧の中にいる(以下同様)
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
+inoremap [<Enter> []<Left><CR><ESC><S-o>
+inoremap (<Enter> ()<Left><CR><ESC><S-o>
+
+" ２回esc を押したら検索のハイライトをヤメる
+nmap <Esc><Esc> :nohlsearch<CR><Esc>
+" }}}
+
+" インサートモードで移動
+imap <C-h> <left>
+imap <C-l> <Right>
+imap <C-k> <Up>
+imap <C-j> <Down>
+
+" visulaモードでインデント調整後に選択範囲を開放しない
+vnoremap > >gv
+vnoremap < <gv
+
+"nnoremap s <Nop>
 nnoremap sj <C-w>j
 nnoremap sk <C-w>k
 nnoremap sl <C-w>l
 nnoremap sh <C-w>h
-nnoremap sJ <C-w>J
-nnoremap sK <C-w>K
-nnoremap sL <C-w>L
-nnoremap sH <C-w>H
-nnoremap sn gt
-nnoremap sp gT
-nnoremap sr <C-w>r
-nnoremap s= <C-w>=
-nnoremap sw <C-w>w
-nnoremap so <C-w>_<C-w>|
-nnoremap sO <C-w>=
-nnoremap sN :<C-u>bn<CR>
-nnoremap sP :<C-u>bp<CR>
-nnoremap st :<C-u>tabnew<CR>
-nnoremap sT :<C-u>Unite tab<CR>
+"nnoremap sJ <C-w>J
+"nnoremap sK <C-w>K
+"nnoremap sL <C-w>L
+"nnoremap sH <C-w>H
+"nnoremap sn gt
+"nnoremap sp gT
+"nnoremap sr <C-w>r
+"nnoremap s= <C-w>=
+"nnoremap sw <C-w>w
+"nnoremap so <C-w>_<C-w>|
+"nnoremap sO <C-w>=
+"nnoremap sN :<C-u>bn<CR>
+"nnoremap sP :<C-u>bp<CR>
+"nnoremap st :<C-u>tabnew<CR>
+"nnoremap sT :<C-u>Unite tab<CR>
 nnoremap ss :<C-u>sp<CR>
 nnoremap sv :<C-u>vs<CR>
-nnoremap sq :<C-u>q<CR>
-nnoremap sQ :<C-u>bd<CR>
-nnoremap sb :<C-u>Unite buffer_tab -buffer-name=file<CR>
-nnoremap sB :<C-u>Unite buffer -buffer-name=file<CR>
+"nnoremap sq :<C-u>q<CR>
+"nnoremap sQ :<C-u>bd<CR>
+"nnoremap sb :<C-u>Unite buffer_tab -buffer-name=file<CR>
+"nnoremap sB :<C-u>Unite buffer -buffer-name=file<CR>
 
-call submode#enter_with('bufmove', 'n', '', 's>', '<C-w>>')
-call submode#enter_with('bufmove', 'n', '', 's<', '<C-w><')
-call submode#enter_with('bufmove', 'n', '', 's+', '<C-w>+')
-call submode#enter_with('bufmove', 'n', '', 's-', '<C-w>-')
-call submode#map('bufmove', 'n', '', '>', '<C-w>>')
-call submode#map('bufmove', 'n', '', '<', '<C-w><')
-call submode#map('bufmove', 'n', '', '+', '<C-w>+')
-call submode#map('bufmove', 'n', '', '-', '<C-w>-')
+"call submode#enter_with('bufmove', 'n', '', 's>', '<C-w>>')
+"call submode#enter_with('bufmove', 'n', '', 's<', '<C-w><')
+"call submode#enter_with('bufmove', 'n', '', 's+', '<C-w>+')
+"call submode#enter_with('bufmove', 'n', '', 's-', '<C-w>-')
+"call submode#map('bufmove', 'n', '', '>', '<C-w>>')
+"call submode#map('bufmove', 'n', '', '<', '<C-w><')
+"call submode#map('bufmove', 'n', '', '+', '<C-w>+')
+"call submode#map('bufmove', 'n', '', '-', '<C-w>-')
 
 " タブで引数ファイルを開く
 nnoremap <silent> <leader>te :<c-u>tabedit<cr>
@@ -214,4 +254,7 @@ noremap <C-a> ^
 noremap <C-e> $
 noremap <C-k> {
 noremap <C-j> }
+
+" fzf
+nnoremap <silent> <C-g> :GFiles<CR>
 
