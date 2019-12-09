@@ -6,8 +6,8 @@ fi
 
 #goenv
 # goenvを利用する時
-export PATH="$HOME/.goenv/bin:$PATH"
-eval "$(goenv init -)"
+# export PATH="$HOME/.goenv/bin:$PATH"
+# eval "$(goenv init -)"
 export GOPATH="$HOME/workspace/go"
 export PATH="$GOPATH/bin:$PATH"
 export GO111MODULE=on
@@ -46,14 +46,21 @@ fi
 #eval "$(anyenv init -)"
 
 ## ndenv
-export PATH="$HOME/.ndenv/bin:$PATH"
-eval "$(ndenv init -)"
+#export PATH="$HOME/.ndenv/bin:$PATH"
+#eval "$(ndenv init -)"
 
 ## nodenv
 eval "$(nodenv init -)"
+export PATH=$HOME/.nodebrew/current/bin:$PATH
+
+## dart stagehand
+export PATH="$PATH":"$HOME/.pub-cache/bin"
 
 ## flutter
 export PATH="$PATH:$HOME/flutter/flutter/bin"
+
+## flutter_web
+export PATH="$PATH":"$HOME/flutter/flutter/.pub-cache/bin"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/usr/local/google-cloud-sdk/path.zsh.inc' ]; then source '/usr/local/google-cloud-sdk/path.zsh.inc'; fi

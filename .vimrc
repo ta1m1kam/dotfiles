@@ -67,7 +67,7 @@ call plug#begin('~/.vim/plugged')
 " ここに追加したいVimプラグインを記述する・・・・・・②
 " ファイルをtree表示してくれる
 Plug 'scrooloose/nerdtree'
-nnoremap <silent><C-e> :NERDTreeToggle<CR>
+nnoremap <silent><C-t> :NERDTreeToggle<CR>
 " unite.vim
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neomru.vim'
@@ -209,3 +209,9 @@ nnoremap <silent> <leader>te :<c-u>tabedit<cr>
 " ターミナルモード
 nnoremap tm :belowright :terminal<CR>
 tnoremap <C-Q> <C-W>N
+
+noremap <C-a> ^
+noremap <C-e> $
+noremap <C-k> {
+noremap <C-j> }
+
