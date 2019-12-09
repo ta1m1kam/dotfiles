@@ -105,6 +105,7 @@ alias tree='tree -C'
 alias vi='vim'
 alias f='open .'
 alias mkdir='mkdir -p'
+alias mduch='sh $HOME/dotfiles/lib/touch_mkdir.sh'
 
 ## git系
 alias gs='git status'
@@ -120,3 +121,4 @@ alias zshrc='source ~/.zshrc'
 
 ## Global alias
 alias -g G='| grep'
+
