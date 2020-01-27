@@ -2,7 +2,7 @@
 
 function links() {
   set -e
-  DOT_DIRECTORY="${HOME}/dotfiles/${1}"
+  DOT_DIRECTORY=~/dotfiles/${1}
   cd $DOT_DIRECTORY
 
   for f in .??*
@@ -14,6 +14,6 @@ function links() {
       [[ "$f" == ".github" ]] && continue
 
       echo "$f"
-      ln -sf ${DOT_DIRECTORY}/${f} ${HOME}/${f}
+#      ln -sf ${DOT_DIRECTORY}/${f} ${HOME}/${f}
   done
 }
