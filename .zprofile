@@ -46,11 +46,11 @@ fi
 #eval "$(anyenv init -)"
 
 ## ndenv
-#export PATH="$HOME/.ndenv/bin:$PATH"
-#eval "$(ndenv init -)"
+# export PATH="$HOME/.ndenv/bin:$PATH"
+# eval "$(ndenv init -)"
 
 ## nodenv
-eval "$(nodenv init -)"
+#eval "$(nodenv init -)"
 export PATH=$HOME/.nodebrew/current/bin:$PATH
 
 ## dart stagehand
@@ -68,3 +68,5 @@ if [ -f '/usr/local/google-cloud-sdk/path.zsh.inc' ]; then source '/usr/local/go
 # The next line enables shell command completion for gcloud.
 if [ -f '/usr/local/google-cloud-sdk/completion.zsh.inc' ]; then source '/usr/local/google-cloud-sdk/completion.zsh.inc'; fi
 
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"

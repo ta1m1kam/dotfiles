@@ -1,0 +1,10 @@
+name: macos
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      -
