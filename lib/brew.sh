@@ -11,4 +11,6 @@ function install_brew() {
   echo "Updating Homebrew..."
   brew update && brew upgrade
 
+  echo "Brew install xx"
+  brew bundle
 }
