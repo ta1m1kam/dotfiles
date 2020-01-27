@@ -6,10 +6,10 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
+
 brew "readline", link: true
 brew "awscli"
 brew "bat"
-brew "cocoapods", link: false
 brew "direnv"
 brew "fzf"
 brew "go"
@@ -31,5 +31,6 @@ brew "wget"
 brew "aws/tap/aws-sam-cli"
 brew "dart-lang/dart/dart"
 brew "heroku/brew/heroku"
+
 cask "chromedriver"
 cask "ngrok"
