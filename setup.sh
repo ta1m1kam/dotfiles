@@ -1,9 +1,25 @@
 #!/bin/bash
 
 source ./lib/brew.sh
+source ./lib/dotfiles_link.sh
 
-has() {
-  type "$1" > /dev/null 2>&1
+function install() {
+  has() {
+    type "$1" > /dev/null 2>&1
+  }
+  install_brew
 }
 
-run_brew
+function deploy() {
+  links zsh
+  links git
+  links vim
+  links tmux
+  links others
+}
+
+if [ "$1" == "install" ]; then
+  install
+elif [ "$1" == "deploy" ]; then
+  deploy
+fi
