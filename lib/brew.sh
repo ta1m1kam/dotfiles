@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function run_brew() {
+function install_brew() {
   if has "brew"; then
     echo "$(tput setaf 2)Already installed Homebrew ✔︎$(tput sgr0)"
   else
