@@ -8,8 +8,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Install && Update
-        run: make install
 
       - name: Deploy
         run: make deploy

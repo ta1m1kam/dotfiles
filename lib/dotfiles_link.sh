@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/bash -e
 
 function links() {
-  set -e
-  DOT_DIRECTORY=~/dotfiles/${1}
-  cd $DOT_DIRECTORY
+  DOT_DIRECTORY=~/dotfiles
 
+  pwd
+  ls -al
   for f in .??*
   do
       [[ "$f" == ".git" ]] && continue
@@ -14,6 +14,6 @@ function links() {
       [[ "$f" == ".github" ]] && continue
 
       echo "$f"
-#      ln -sf ${DOT_DIRECTORY}/${f} ${HOME}/${f}
+      ln -sf ${DOT_DIRECTORY}/${f} ${HOME}/${f}
   done
 }
