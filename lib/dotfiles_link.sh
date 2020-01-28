@@ -16,3 +16,9 @@ function links() {
       ln -sf ${DOT_DIRECTORY}/${f} ${HOME}/${f}
   done
 }
+
+function copy() {
+  DOT_DIRECTORY="${HOME}/dotfiles/${1}"
+  echo $DOT_DIRECTORY
+  cp -r $DOT_DIRECTORY ${HOME}/${1}
+}

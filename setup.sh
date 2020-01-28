@@ -16,6 +16,8 @@ function deploy() {
   links vim
   links tmux
   links others
+  copy .vim
+  copy .tmux
 }
 
 if [ "$1" == "install" ]; then
