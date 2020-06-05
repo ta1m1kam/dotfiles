@@ -142,7 +142,7 @@ nnoremap == gg=G
 " => Plugins configuration ------------------------------------- {{{1
 " コントロールキーとhjklで分割されたウィンドウを素早く移動する
 let NERDTreeShowBookmarks = 1 " 起動時にブックマーク表示
-autocmd VimEnter * NERDTree " Vim起動時にNERDTreeを開く
+" autocmd VimEnter * NERDTree " Vim起動時にNERDTreeを開く
 " NERDTreeのウィンドウしか開かれていないときは自動的に閉じる
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
