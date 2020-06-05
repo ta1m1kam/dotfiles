@@ -11,7 +11,6 @@ zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-completions"
 zplug "chrissicool/zsh-256color"
-zplug "docker/cli", use: "contrib/completion/zsh/_docker"
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -22,6 +21,9 @@ if ! zplug check --verbose; then
 fi
 # Then, source plugins and add commands to $PATH
 zplug load
+
+# prompt style
+zstyle ':prompt:pure:path' color cyan
 
 export LC_CTYPE=UTF-8
 
@@ -104,6 +106,7 @@ alias mv='mv -i'
 alias cp='cp -i'
 alias ..='cd ..'
 alias ls='ls -G'
+export LSCOLORS=Cxfxcxdxbxegedabagacad
 alias la='ls -a'
 alias ll='ls -l'
 alias tree='tree -C'
