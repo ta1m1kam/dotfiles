@@ -92,9 +92,7 @@ export FZF_DEFAULT_OPTS='--height 30% --border'
 ## cd XXX
 alias d='cd ~/Desktop'
 alias dotfiles='cd ~/dotfiles'
-alias K='cd ~/workspace/Karappo'
 alias W='cd ~/workspace'
-alias R='cd ~/research'
 
 ## open XXX
 alias od='open ~/Desktop'
@@ -119,7 +117,7 @@ alias mduch='sh $HOME/dotfiles/lib/touch_mkdir.sh'
 alias gs='git status'
 alias gd='git diff'
 alias ga='git add'
-alias gc='git commit'
+alias gc='gitmoji -c'
 
 ## docker alias
 alias dc='docker-compose'
@@ -133,3 +131,87 @@ alias -g G='| grep'
 ## tmux
 alias t='tmux'
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# nvm
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local node_version="$(nvm version)"
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use
+    fi
+  elif [ "$node_version" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+
+# bun completions
+[ -s "/Users/taigamikami/.bun/_bun" ] && source "/Users/taigamikami/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+#Change this variable to your environment
+export BACK_END_REPO="/Users/taigamikami/workspace/backend/back-end"
+
+alias sso="aws sso login --profile=backend-prod-admin"
+alias sts="aws sts get-caller-identity"
+
+alias use-be-prod="export AWS_PROFILE=backend-prod-admin"
+alias use-be-stg="export AWS_PROFILE=backend-stg-admin"
+alias use-be-dev="export AWS_PROFILE=backend-dev-admin"
+
+alias use-so-dev="export AWS_PROFILE=so-dev"
+alias use-so-stg="export AWS_PROFILE=so-stg"
+alias use-so-prod="export AWS_PROFILE=so-prod"
+
+alias login-prod="ecspresso exec --config $BACK_END_REPO/monolith/deploy/production/app.yml"
+alias login-stg="ecspresso exec --config $BACK_END_REPO/monolith/deploy/staging/app.yml"
+alias login-sco-g="ecspresso exec --config $BACK_END_REPO/gateway/deploy/staging/gateway.yml"
+alias login-ce="ecspresso exec --config $BACK_END_REPO/monolith/deploy/ce/app.yml"
+alias login-opex="ecspresso exec --config $BACK_END_REPO/monolith/deploy/opex/app.yml"
+alias login-sco="ecspresso exec --config $BACK_END_REPO/monolith/deploy/sco/app.yml"
+alias login-sco-g="ecspresso exec --config $BACK_END_REPO/gateway/deploy/sco/gateway.yml"
+alias login-ce-w="ecspresso exec --config $BACK_END_REPO/monolith/deploy/ce/sidekiq.yml"
+alias login-demo="ecspresso exec --config $BACK_END_REPO/monolith/deploy/demo/app.yml"
+alias login-demo-w="ecspresso exec --config $BACK_END_REPO/monolith/deploy/demo/sidekiq.yml"
+
+# run to apply Env vars updated on AWS console
+alias deploy-ce="ecspresso deploy --config $BACK_END_REPO/monolith/deploy/ce/app.yml"
+alias deploy-ce-w="ecspresso deploy --config $BACK_END_REPO/monolith/deploy/ce/sidekiq.yml"
+
+# run under infra/backend/
+alias cdk-diff="node_modules/.bin/cdk diff shippio-backend-ce-stack"
+alias cdk-deploy="node_modules/.bin/cdk deploy shippio-backend-ce-stack"
+
+
+export DENO_INSTALL="/Users/taigamikami/.deno"
+export PATH="$DENO_INSTALL/bin:$PATH"
+
+source /Users/taigamikami/.gvm/scripts/gvm
+
+# rbenv
+eval "$(rbenv init - zsh)"
+
+[ -f ~/.inshellisense/key-bindings.zsh ] && source ~/.inshellisense/key-bindings.zsh
+
+# oj
+export PATH="/Users/taigamikami/.local/bin:$PATH"
+
+
+# protobuf
+GOPRIVATE=github.com/Tech-Design-Inc/protobuf
+export GOPRIVATE=github.com/Tech-Design-Inc/protobuf
