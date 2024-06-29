@@ -1,0 +1,14 @@
+
+# [CORE] Changes that affect the build system, external dependencies, config files or CI related things.
+# [DOC] Documentation only changes
+# [FEATURE] A new feature
+# [ENHANCE] For enhancements
+# [FIX] A bug fix
+# [REF] review fix
+# [PERF] A code change that improves performance
+# [REFACTOR] A code change that neither fixes a bug nor adds a feature
+# [STYLE] Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+# [TEST] Adding missing tests or correcting existing tests
+# [CHORE] Changes to the build process or auxiliary tools and libraries such as documentation generation
+
+

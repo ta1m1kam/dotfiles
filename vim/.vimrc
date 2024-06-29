@@ -9,15 +9,7 @@ Plug 'simeji/winresizer'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-  Plug 'tpope/vim-fugitive'
-  Plug 'christoomey/vim-tmux-navigator'
-endif
+Plug 'maksimr/vim-jsbeautify'
 let g:deoplete#enable_at_startup = 1
 call plug#end()
 
@@ -67,10 +59,6 @@ endif
 set undodir=$HOME/.vim/undodir
 
 " => Looks ------------------------------------- {{{1
-" Powerlineを読み込む
-python3 from powerline.vim import setup as powerline_setup
-python3 powerline_setup()
-python3 del powerline_setup
 
 " カーソルの形
 if has('vim_starting')
@@ -96,13 +84,14 @@ map <up> <nop>
 map <down> <nop>
 map <left> <nop>
 map <right> <nop>
+map <c-f> :call JsBeautify()<cr>
 
 " 対応する閉じ括弧や引用符を入力する
-inoremap ' ''<esc>i
-inoremap " ""<esc>i
-inoremap ( ()<esc>i
-inoremap { {}<esc>i
-inoremap [ []<esc>i
+" inoremap ' ''<esc>i
+" inoremap " ""<esc>i
+" inoremap ( ()<esc>i
+" inoremap { {}<esc>i
+" inoremap [ []<esc>i
 
 " インサートモードで移動"
 imap <c-h> <left>
