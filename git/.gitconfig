@@ -5,3 +5,7 @@
 	ui = true
 [core]
     excludesfile = /Users/mikamitaiga/.gitignore_global
+[commit]
+	template = ~/dotfiles/git/.gitmessage.txt
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
