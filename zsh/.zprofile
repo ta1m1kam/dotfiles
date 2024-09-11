@@ -6,9 +6,9 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # goenvを利用する時
 # export PATH="$HOME/.goenv/bin:$PATH"
 # eval "$(goenv init -)"
-export GOPATH="$HOME/workspace/go"
-export PATH="$GOPATH/bin:$PATH"
-export GO111MODULE=on
+# export GOPATH="$HOME/workspace/go"
+# export PATH="$GOPATH/bin:$PATH"
+# export GO111MODULE=on
 
 # brew go
 # export GOROOT=$HOME/go

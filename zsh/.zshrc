@@ -158,14 +158,14 @@ add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
 # bun completions
-[ -s "/Users/taigamikami/.bun/_bun" ] && source "/Users/taigamikami/.bun/_bun"
+[ -s "/Users/mikamitaiga/.bun/_bun" ] && source "/Users/mikamitaiga/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 #Change this variable to your environment
-export BACK_END_REPO="/Users/taigamikami/workspace/backend/back-end"
+export BACK_END_REPO="/Users/mikamitaiga/workspace/backend/back-end"
 
 alias sso="aws sso login --profile=backend-prod-admin"
 alias sts="aws sts get-caller-identity"
@@ -198,10 +198,10 @@ alias cdk-diff="node_modules/.bin/cdk diff shippio-backend-ce-stack"
 alias cdk-deploy="node_modules/.bin/cdk deploy shippio-backend-ce-stack"
 
 
-export DENO_INSTALL="/Users/taigamikami/.deno"
+export DENO_INSTALL="/Users/mikamitaiga/.deno"
 export PATH="$DENO_INSTALL/bin:$PATH"
 
-source /Users/taigamikami/.gvm/scripts/gvm
+source /Users/mikamitaiga/.gvm/scripts/gvm
 
 # rbenv
 eval "$(rbenv init - zsh)"
@@ -209,9 +209,14 @@ eval "$(rbenv init - zsh)"
 [ -f ~/.inshellisense/key-bindings.zsh ] && source ~/.inshellisense/key-bindings.zsh
 
 # oj
-export PATH="/Users/taigamikami/.local/bin:$PATH"
+export PATH="/Users/mikamitaiga/.local/bin:$PATH"
 
 
 # protobuf
 GOPRIVATE=github.com/Tech-Design-Inc/protobuf
 export GOPRIVATE=github.com/Tech-Design-Inc/protobuf
+
+[[ -s "/Users/mikamitaiga/.gvm/scripts/gvm" ]] && source "/Users/mikamitaiga/.gvm/scripts/gvm"
+
+export PATH=$(go env GOPATH)/bin:$PATH
+
