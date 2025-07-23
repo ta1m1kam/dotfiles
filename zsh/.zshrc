@@ -157,66 +157,33 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-# bun completions
-[ -s "/Users/mikamitaiga/.bun/_bun" ] && source "/Users/mikamitaiga/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-#Change this variable to your environment
-export BACK_END_REPO="/Users/mikamitaiga/workspace/backend/back-end"
-
-alias sso="aws sso login --profile=backend-prod-admin"
-alias sts="aws sts get-caller-identity"
-
-alias use-be-prod="export AWS_PROFILE=backend-prod-admin"
-alias use-be-stg="export AWS_PROFILE=backend-stg-admin"
-alias use-be-dev="export AWS_PROFILE=backend-dev-admin"
-
-alias use-so-dev="export AWS_PROFILE=so-dev"
-alias use-so-stg="export AWS_PROFILE=so-stg"
-alias use-so-prod="export AWS_PROFILE=so-prod"
-
-alias login-prod="ecspresso exec --config $BACK_END_REPO/monolith/deploy/production/app.yml"
-alias login-stg="ecspresso exec --config $BACK_END_REPO/monolith/deploy/staging/app.yml"
-alias login-sco-g="ecspresso exec --config $BACK_END_REPO/gateway/deploy/staging/gateway.yml"
-alias login-ce="ecspresso exec --config $BACK_END_REPO/monolith/deploy/ce/app.yml"
-alias login-opex="ecspresso exec --config $BACK_END_REPO/monolith/deploy/opex/app.yml"
-alias login-sco="ecspresso exec --config $BACK_END_REPO/monolith/deploy/sco/app.yml"
-alias login-sco-g="ecspresso exec --config $BACK_END_REPO/gateway/deploy/sco/gateway.yml"
-alias login-ce-w="ecspresso exec --config $BACK_END_REPO/monolith/deploy/ce/sidekiq.yml"
-alias login-demo="ecspresso exec --config $BACK_END_REPO/monolith/deploy/demo/app.yml"
-alias login-demo-w="ecspresso exec --config $BACK_END_REPO/monolith/deploy/demo/sidekiq.yml"
-
-# run to apply Env vars updated on AWS console
-alias deploy-ce="ecspresso deploy --config $BACK_END_REPO/monolith/deploy/ce/app.yml"
-alias deploy-ce-w="ecspresso deploy --config $BACK_END_REPO/monolith/deploy/ce/sidekiq.yml"
-
-# run under infra/backend/
-alias cdk-diff="node_modules/.bin/cdk diff shippio-backend-ce-stack"
-alias cdk-deploy="node_modules/.bin/cdk deploy shippio-backend-ce-stack"
-
-
-export DENO_INSTALL="/Users/mikamitaiga/.deno"
-export PATH="$DENO_INSTALL/bin:$PATH"
-
-source /Users/mikamitaiga/.gvm/scripts/gvm
-
 # rbenv
 eval "$(rbenv init - zsh)"
 
 [ -f ~/.inshellisense/key-bindings.zsh ] && source ~/.inshellisense/key-bindings.zsh
 
 # oj
-export PATH="/Users/mikamitaiga/.local/bin:$PATH"
-
-
-# protobuf
-GOPRIVATE=github.com/Tech-Design-Inc/protobuf
-export GOPRIVATE=github.com/Tech-Design-Inc/protobuf
-
-[[ -s "/Users/mikamitaiga/.gvm/scripts/gvm" ]] && source "/Users/mikamitaiga/.gvm/scripts/gvm"
+export PATH="/Users/taiga.mikami.001/.local/bin:$PATH"
 
 export PATH=$(go env GOPATH)/bin:$PATH
 
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+yo() {
+  local model_flag=""
+  if [ -n "$CLAUDE_CODE_MODEL" ]; then
+    model_flag="--model $CLAUDE_CODE_MODEL"
+  fi
+  local cmd="claude --add-dir=/Users/taiga.mikami.001/workspace/layerx/memo-tiger/obsidian $model_flag $@"
+  echo "$cmd"
+  eval "$cmd"
+}
+
+oo() {
+  cd "$HOME/workspace/layerx/memo-tiger/obsidian"
+}
+eval "$(~/.local/bin/mise activate zsh)"
+
+# Added by Windsurf
+export PATH="/Users/taiga.mikami.001/.codeium/windsurf/bin:$PATH"
