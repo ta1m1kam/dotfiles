@@ -1,0 +1,19 @@
+# =============================================================================
+# chezmoi ignore patterns
+# Files matching these patterns will not be managed by chezmoi
+# =============================================================================
+
+# README and documentation
+README.md
+LICENSE
+
+# Local files that shouldn't be synced
+.zsh_history
+.bash_history
+.local/
+.cache/
+
+# Application state
+.vim/undo/
+.vim/swap/
+.vim/backup/

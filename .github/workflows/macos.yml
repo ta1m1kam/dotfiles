@@ -1,12 +1,50 @@
 name: macos
 
-on: [push]
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   build:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v1
-      - name: Install && Update
-        run: make install
+      - uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+
+      - name: Install Homebrew packages
+        run: brew bundle --file=Brewfile
+
+      - name: Apply dotfiles with chezmoi
+        run: |
+          chezmoi init --source $PWD --apply
+
+      - name: Setup sheldon
+        run: sheldon lock
+
+      - name: Install mise tools
+        run: mise install
+
+      - name: Verify setup
+        run: |
+          echo "==> Checking chezmoi..."
+          chezmoi --version
+          ls -la ~/.zshrc ~/.vimrc ~/.gitconfig ~/.tmux.conf ~/.tigrc
+
+          echo "==> Checking mise..."
+          mise --version
+          mise list
+
+          echo "==> Checking sheldon..."
+          sheldon --version
+
+          echo "==> Checking installed tools..."
+          which fzf && fzf --version
+          which rg && rg --version
+          which bat && bat --version
+          which ghq && ghq --version
+          which tig && tig --version

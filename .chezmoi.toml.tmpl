@@ -1,0 +1,13 @@
+# =============================================================================
+# chezmoi configuration
+# https://www.chezmoi.io/reference/configuration-file/
+# =============================================================================
+
+[data]
+    name = "TaigaMikami"
+    email = "mikamimikami60@gmail.com"
+{{- if or (eq .chezmoi.hostname "G9XGW0FWND") (contains "layerx" .chezmoi.hostname) (contains "taiga" .chezmoi.hostname) }}
+    work = true
+{{- else }}
+    work = false
+{{- end }}

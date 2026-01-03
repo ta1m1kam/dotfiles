@@ -1,0 +1,143 @@
+# =============================================================================
+# mise configuration
+# https://mise.jdx.dev/configuration.html
+# =============================================================================
+
+[settings]
+experimental = true
+
+[tools]
+node = "lts"
+python = "3.12"
+ruby = "3.3"
+go = "latest"
+
+# =============================================================================
+# Tasks
+# =============================================================================
+
+[tasks.setup]
+description = "Setup development environment"
+run = """
+#!/bin/bash
+set -e
+
+echo "==> Installing Homebrew packages..."
+brew bundle --file=~/dotfiles/Brewfile
+
+echo "==> Applying dotfiles with chezmoi..."
+chezmoi init --source ~/dotfiles --apply
+
+echo "==> Setting up sheldon..."
+sheldon lock --update
+
+echo "==> Setting up mise..."
+mise install
+
+echo "==> Installing bat theme..."
+mkdir -p "$(bat --config-dir)/themes"
+curl -sL -o "$(bat --config-dir)/themes/Catppuccin-mocha.tmTheme" \
+  https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme
+bat cache --build
+
+echo "==> Setup complete!"
+"""
+
+[tasks.apply]
+description = "Apply dotfiles with chezmoi"
+run = """
+#!/bin/bash
+set -e
+
+chezmoi apply --source ~/dotfiles
+echo "==> Dotfiles applied!"
+"""
+
+[tasks.update]
+description = "Update all tools"
+run = """
+#!/bin/bash
+set -e
+
+echo "==> Updating Homebrew..."
+brew update && brew upgrade
+
+echo "==> Updating mise..."
+mise upgrade
+
+echo "==> Updating sheldon plugins..."
+sheldon lock --update
+
+echo "==> Updating dotfiles..."
+chezmoi update --source ~/dotfiles
+
+echo "==> Update complete!"
+"""
+
+[tasks.diff]
+description = "Show diff between source and destination"
+run = """
+#!/bin/bash
+chezmoi diff --source ~/dotfiles
+"""
+
+[tasks.edit]
+description = "Edit dotfiles source"
+run = """
+#!/bin/bash
+chezmoi edit --source ~/dotfiles "$@"
+"""
+
+[tasks.install]
+description = "Full installation (brew + chezmoi + mise + sheldon)"
+run = """
+#!/bin/bash
+set -e
+
+echo "==> Installing Homebrew packages..."
+brew bundle --file=~/dotfiles/Brewfile
+
+echo "==> Initializing chezmoi..."
+chezmoi init --source ~/dotfiles --apply
+
+echo "==> Setting up sheldon..."
+sheldon lock --update
+
+echo "==> Setting up mise..."
+mise install
+
+echo "==> Installing bat theme..."
+mkdir -p "$(bat --config-dir)/themes"
+curl -sL -o "$(bat --config-dir)/themes/Catppuccin-mocha.tmTheme" \
+  https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme
+bat cache --build
+
+echo "==> Installation complete!"
+echo "==> Please restart your shell or run: source ~/.zshrc"
+"""
+
+[tasks.clean]
+description = "Remove old version managers (rbenv, nvm, pyenv)"
+run = """
+#!/bin/bash
+set -e
+
+echo "==> This will remove rbenv, nvm, and pyenv directories."
+read -p "Are you sure? (y/N): " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+  echo "Aborted."
+  exit 0
+fi
+
+echo "==> Removing ~/.rbenv..."
+rm -rf ~/.rbenv
+
+echo "==> Removing ~/.nvm..."
+rm -rf ~/.nvm
+
+echo "==> Removing ~/.pyenv..."
+rm -rf ~/.pyenv
+
+echo "==> Cleanup complete!"
+echo "==> Note: You may also want to run 'brew uninstall rbenv ruby-build pyenv' if installed via Homebrew."
+"""

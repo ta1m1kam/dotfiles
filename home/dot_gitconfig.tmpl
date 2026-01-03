@@ -1,0 +1,39 @@
+# =============================================================================
+# .gitconfig - Git Configuration
+# =============================================================================
+
+[user]
+    name = {{ .name }}
+    email = {{ .email }}
+
+[color]
+    ui = true
+
+[core]
+    excludesfile = ~/.gitignore_global
+
+[commit]
+    template = ~/.gitmessage.txt
+
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+
+{{- if .work }}
+[url "ssh://git@github.com/LayerXcom/"]
+    insteadOf = https://github.com/LayerXcom/
+{{- end }}
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[push]
+    default = current

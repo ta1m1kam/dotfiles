@@ -1,0 +1,92 @@
+# =============================================================================
+# tig configuration
+# https://jonas.github.io/tig/doc/manual.html
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# View settings
+# -----------------------------------------------------------------------------
+set main-view = id:yes date:default,local=yes author:abbreviated commit-title:graph=yes,refs=yes,overflow=no
+set blame-view = date:default id:yes,color line-number:yes,interval=1 text
+set diff-view = text:yes,commit-title-overflow=no line-number:yes
+set pager-view = text
+set stage-view = text
+set log-view = text
+set blob-view = text
+set tab-size = 2
+set ignore-case = true
+set split-view-width = 80%
+set split-view-height = 80%
+set diff-options = -m --first-parent
+set refresh-mode = auto
+
+# -----------------------------------------------------------------------------
+# Mouse support
+# -----------------------------------------------------------------------------
+set mouse = true
+set mouse-scroll = 3
+
+# -----------------------------------------------------------------------------
+# Color settings (Catppuccin Mocha inspired)
+# -----------------------------------------------------------------------------
+color cursor black white bold
+color title-focus black cyan
+color title-blur black blue
+color diff-header yellow default bold
+color diff-index cyan default
+color diff-chunk magenta default bold
+color "Merge:" cyan default
+color "Author:" cyan default
+color "Date:" yellow default
+color graph-commit cyan default
+color status.header yellow default
+color status.section cyan default bold
+
+# -----------------------------------------------------------------------------
+# Key bindings - Status view
+# -----------------------------------------------------------------------------
+bind status D ?@rm %(file)
+bind status C !git commit
+bind status A !git commit --amend
+bind status S !git stash push -m "%(prompt Enter stash message: )"
+
+# -----------------------------------------------------------------------------
+# Key bindings - Main view
+# -----------------------------------------------------------------------------
+bind main C !git cherry-pick %(commit)
+bind main R !git rebase -i %(commit)^
+bind main ! ?git revert %(commit)
+bind main G move-last-line
+bind main g move-first-line
+bind main B !git checkout -b "%(prompt Enter branch name: )" %(commit)
+bind main P !git push origin HEAD
+bind main F !git fetch --all --prune
+bind main M !git merge %(commit)
+bind main T !git tag "%(prompt Enter tag name: )" %(commit)
+
+# -----------------------------------------------------------------------------
+# Key bindings - Diff view
+# -----------------------------------------------------------------------------
+bind diff G move-last-line
+bind diff g move-first-line
+
+# -----------------------------------------------------------------------------
+# Key bindings - Refs view
+# -----------------------------------------------------------------------------
+bind refs C !git checkout %(ref)
+bind refs D ?git branch -d %(branch)
+bind refs N !git checkout -b "%(prompt Enter branch name: )"
+bind refs M !git merge %(ref)
+bind refs P !git push origin %(ref)
+
+# -----------------------------------------------------------------------------
+# Key bindings - Stash view
+# -----------------------------------------------------------------------------
+bind stash A !git stash apply %(stash)
+bind stash P !git stash pop %(stash)
+bind stash D ?git stash drop %(stash)
+
+# -----------------------------------------------------------------------------
+# Key bindings - Generic
+# -----------------------------------------------------------------------------
+bind generic Y !@bash -c "echo -n %(commit) | pbcopy"
