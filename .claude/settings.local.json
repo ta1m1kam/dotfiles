@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(sheldon:*)",
-      "Bash(chezmoi apply:*)"
+      "Bash(chezmoi apply:*)",
+      "Bash(chezmoi init:*)",
+      "Bash(chezmoi diff:*)",
+      "Bash(cat:*)"
     ]
   }
 }

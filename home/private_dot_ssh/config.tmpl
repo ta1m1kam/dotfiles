@@ -1,0 +1,44 @@
+Include {{ .chezmoi.homeDir }}/.colima/ssh_config
+
+{{- if .work }}
+
+Host bastion-dev
+  HostName i-0619bd21479c37272
+  LocalForward 30443 api-private.invoice-dev.pjdx.in:443
+  LocalForward 31443 api-private.ocr-dev.pjdx.in:443
+  LocalForward 34440 localhost:4440
+  LocalForward 33306 payer-dev-main.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+  LocalForward 33307 lod-dev-main.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+  LocalForward 39200 es.id-dev.pjdx.in:443
+  LocalForward 39201 es.box-dev.pjdx.in:443
+  LocalForward 33308 layerone-dev-multidb1.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+  LocalForward 33309 layerone-dev-multidb1.cluster-ro-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+
+Host bastion-stg
+  HostName i-0805373a1259cf928
+  LocalForward 40443 api-private.invoice-stg.pjdx.in:443
+  LocalForward 41443 api-private.ocr-stg.pjdx.in:443
+  LocalForward 44440 localhost:4440
+  LocalForward 43306 payer-stg-main.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+  LocalForward 43307 lod-stg-main.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+  LocalForward 43308 db.box-stg.pjdx.in:3306
+  LocalForward 43309 card-stg-main.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+  LocalForward 49200 es.id-stg.pjdx.in:443
+  LocalForward 49201 es.box-stg.pjdx.in:443
+  LocalForward 33309 layerone-stg-multidb1.cluster-cvgxfdlctzqp.ap-northeast-1.rds.amazonaws.com:3306
+
+Host *-dev *-stg
+  ProxyCommand sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p' --profile dev"
+
+Host *-prd
+  ProxyCommand sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p' --profile prd"
+
+# SSH over Session Manager
+Host i-* mi-*
+  ProxyCommand sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
+  IdentityFile ~/.ssh/id_ed25519
+
+Host bastion-*
+  User ec2-user
+  IdentityFile ~/.ssh/id_ed25519
+{{- end }}

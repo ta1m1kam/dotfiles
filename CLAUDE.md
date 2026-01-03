@@ -41,7 +41,8 @@ dotfiles/
 │   ├── dot_tigrc            # → ~/.tigrc
 │   └── dot_config/          # → ~/.config/
 │       ├── mise/config.toml
-│       └── sheldon/plugins.toml
+│       ├── sheldon/plugins.toml
+│       └── zsh/functions/   # カスタム関数（分割管理）
 ├── .chezmoi.toml.tmpl       # chezmoi設定テンプレート
 ├── .chezmoiroot             # ソースルート指定
 ├── Brewfile                 # Homebrewパッケージ定義
@@ -74,17 +75,30 @@ dotfiles/
 | zshプラグイン管理 | sheldon | pure, autosuggestions, syntax-highlighting |
 | ファジーファインダー | fzf | ファイル検索、履歴検索 |
 | リポジトリ管理 | ghq | Gitリポジトリの一元管理 |
-| Git UI | tig | TUIベースのGit操作 |
+| Git UI | tig, gitui | TUIベースのGit操作 |
+| ファイルマネージャー | yazi | Vim風TUIファイルマネージャー |
+| タスクランナー | just | Makefile代替 |
+| プロセス表示 | procs | ps代替（カラフル表示） |
+| システムモニター | bottom | htop代替 |
+| ベンチマーク | hyperfine | コマンド計測 |
 
-## .zshrc のカスタム関数
+## カスタム関数
+
+関数は `~/.config/zsh/functions/` に分割管理。
 
 | 関数 | キーバインド | 説明 |
 |------|-------------|------|
 | `repo` | Ctrl+G | ghq + fzf でリポジトリに移動 |
 | `vf` | Ctrl+F | fzf でファイルを選択してvimで開く |
 | `gb` | Ctrl+B | fzf でGitブランチを切り替え |
-| `rgf` | - | ripgrep + fzf でファイル内検索 |
-| `gadd` | - | fzf でファイルを選択してgit add |
+| `zf` | Ctrl+J | zoxide + fzf でディレクトリ移動 |
+| `hd` | Ctrl+H | atuin でカレントディレクトリの履歴検索 |
+| `yy` | - | yazi起動、終了時にディレクトリ移動 |
+| `jf` | - | just レシピを fzf で選択実行 |
+| `pk` | - | procs + fzf でプロセス kill |
+| `gu` | - | gitui 起動（エイリアス） |
+
+詳細は README.md を参照。
 
 ## 新しいマシンへのセットアップ
 

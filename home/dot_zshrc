@@ -3,6 +3,12 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
+# PATH (must be set before other tools)
+# -----------------------------------------------------------------------------
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# -----------------------------------------------------------------------------
 # sheldon (plugin manager)
 # -----------------------------------------------------------------------------
 eval "$(sheldon source)"
@@ -100,9 +106,8 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
 # -----------------------------------------------------------------------------
-# PATH
+# PATH (additional)
 # -----------------------------------------------------------------------------
-export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
 
 # =============================================================================
@@ -168,170 +173,11 @@ alias zshrc='source ~/.zshrc'
 alias -g G='| grep'
 
 # =============================================================================
-# Functions - ghq + fzf
+# Functions (loaded from ~/.config/zsh/functions/)
 # =============================================================================
-
-function repo() {
-  local dir
-  dir=$(ghq list -p | fzf --preview 'bat --color=always --style=header,grid --line-range :80 {}/README.md 2>/dev/null || ls -la {}')
-  if [[ -n "$dir" ]]; then
-    cd "$dir"
-  fi
-}
-
-function repo-browse() {
-  local repo
-  repo=$(ghq list | fzf --preview 'ghq list -p | grep {} | xargs ls -la')
-  if [[ -n "$repo" ]]; then
-    gh browse -R "$repo"
-  fi
-}
-
-function get() {
-  ghq get "$1" && repo
-}
-
-# =============================================================================
-# Functions - fzf + ripgrep
-# =============================================================================
-
-function rgf() {
-  local file line
-  read -r file line <<<"$(rg --line-number --no-heading "$@" | \
-    fzf --delimiter ':' \
-        --preview 'bat --color=always --highlight-line {2} {1}' \
-        --preview-window 'right:60%:+{2}-10' | \
-    awk -F: '{print $1, $2}')"
-  if [[ -n "$file" ]]; then
-    vim "$file" +"$line"
-  fi
-}
-
-function vf() {
-  local file
-  file=$(fzf --preview 'bat --color=always --style=numbers --line-range :500 {}')
-  if [[ -n "$file" ]]; then
-    vim "$file"
-  fi
-}
-
-function cdf() {
-  local dir
-  dir=$(find . -type d 2>/dev/null | fzf --preview 'ls -la {}')
-  if [[ -n "$dir" ]]; then
-    cd "$dir"
-  fi
-}
-
-# =============================================================================
-# Functions - fzf + Git
-# =============================================================================
-
-function gb() {
-  local branch
-  branch=$(git branch -a --sort=-committerdate | \
-    fzf --preview 'git log --oneline --graph --color=always {1} | head -50' | \
-    sed 's/^[* ]*//' | sed 's/remotes\/origin\///')
-  if [[ -n "$branch" ]]; then
-    git checkout "$branch"
-  fi
-}
-
-function gshow() {
-  local commit
-  commit=$(git log --oneline --graph --color=always | \
-    fzf --ansi --preview 'echo {} | cut -d" " -f2 | xargs git show --color=always' | \
-    awk '{print $2}')
-  if [[ -n "$commit" ]]; then
-    git show "$commit"
-  fi
-}
-
-function gcp() {
-  local commit
-  commit=$(git log --oneline --all --graph --color=always | \
-    fzf --ansi --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs git show --color=always' | \
-    grep -o "[a-f0-9]\{7\}" | head -1)
-  if [[ -n "$commit" ]]; then
-    git cherry-pick "$commit"
-  fi
-}
-
-function gstash() {
-  local stash
-  stash=$(git stash list | \
-    fzf --preview 'echo {} | cut -d: -f1 | xargs git stash show -p --color=always' | \
-    cut -d: -f1)
-  if [[ -n "$stash" ]]; then
-    git stash apply "$stash"
-  fi
-}
-
-function gadd() {
-  local files
-  files=$(git status -s | \
-    fzf -m --preview 'echo {} | awk "{print \$2}" | xargs git diff --color=always' | \
-    awk '{print $2}')
-  if [[ -n "$files" ]]; then
-    echo "$files" | xargs git add
-    git status -s
-  fi
-}
-
-# =============================================================================
-# Functions - peco
-# =============================================================================
-
-function peco-kill() {
-  local pid
-  pid=$(ps aux | peco | awk '{print $2}')
-  if [[ -n "$pid" ]]; then
-    echo "Killing process $pid"
-    kill "$pid"
-  fi
-}
-
-function peco-ip() {
-  ifconfig | grep 'inet ' | peco | awk '{print $2}'
-}
-
-# =============================================================================
-# Functions - Docker
-# =============================================================================
-
-function dex() {
-  local container
-  container=$(docker ps --format "{{.Names}}" | peco)
-  if [[ -n "$container" ]]; then
-    docker exec -it "$container" "${1:-sh}"
-  fi
-}
-
-function drmi() {
-  local images
-  images=$(docker images | tail -n +2 | peco | awk '{print $3}')
-  if [[ -n "$images" ]]; then
-    echo "$images" | xargs docker rmi
-  fi
-}
-
-# =============================================================================
-# Functions - Custom
-# =============================================================================
-
-function yo() {
-  local model_flag=""
-  if [ -n "$CLAUDE_CODE_MODEL" ]; then
-    model_flag="--model $CLAUDE_CODE_MODEL"
-  fi
-  local cmd="claude --add-dir=$HOME/workspace/layerx/memo-tiger/obsidian $model_flag $@"
-  echo "$cmd"
-  eval "$cmd"
-}
-
-function oo() {
-  cd "$HOME/workspace/layerx/memo-tiger/obsidian"
-}
+for f in ~/.config/zsh/functions/*.zsh(N); do
+  source "$f"
+done
 
 # =============================================================================
 # Key bindings
@@ -345,3 +191,9 @@ bindkey -s '^f' 'vf\n'
 
 # Ctrl+B: fzf でブランチ切り替え
 bindkey -s '^b' 'gb\n'
+
+# Ctrl+J: zoxide でディレクトリ検索
+bindkey -s '^j' 'zf\n'
+
+# Ctrl+H: カレントディレクトリの履歴検索
+bindkey -s '^h' 'hd\n'
