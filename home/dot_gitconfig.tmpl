@@ -3,8 +3,8 @@
 # =============================================================================
 
 [user]
-    name = {{ .name }}
-    email = {{ .email }}
+    name = {{ .name | default "TaigaMikami" }}
+    email = {{ .email | default "mikamimikami60@gmail.com" }}
 
 [color]
     ui = true
@@ -18,7 +18,7 @@
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
 
-{{- if .work }}
+{{- if (and (hasKey . "work") .work) }}
 [url "ssh://git@github.com/LayerXcom/"]
     insteadOf = https://github.com/LayerXcom/
 {{- end }}
