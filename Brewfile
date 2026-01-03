@@ -6,7 +6,7 @@
 # Taps
 # -----------------------------------------------------------------------------
 tap "aws/tap"
-tap "homebrew/bundle"
+# tap "homebrew/bundle"  # deprecated
 # tap "koekeishiya/formulae"  # yabai (CI環境で利用不可)
 
 # -----------------------------------------------------------------------------
