@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 tap "aws/tap"
 tap "homebrew/bundle"
-tap "koekeishiya/formulae"  # yabai
+# tap "koekeishiya/formulae"  # yabai (CI環境で利用不可)
 
 # -----------------------------------------------------------------------------
 # Formulae - Core
@@ -83,7 +83,7 @@ brew "docker-credential-helper"
 brew "awscli"
 brew "aws/tap/aws-sam-cli"
 brew "azure-cli"
-brew "terraform"
+# brew "terraform"  # tfenv で管理
 brew "tfenv"
 
 # -----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ brew "wireshark"
 # -----------------------------------------------------------------------------
 # Formulae - Window Manager
 # -----------------------------------------------------------------------------
-brew "yabai"
+# brew "yabai"  # CI環境で利用不可
 
 # -----------------------------------------------------------------------------
 # Casks - Browsers
@@ -161,4 +161,4 @@ cask "dockdoor"
 cask "figma"
 cask "jordanbaird-ice"
 cask "meetingbar"
-cask "skitch"
+# cask "skitch"  # 利用不可
