@@ -1,0 +1,18 @@
+# =============================================================================
+# mise configuration
+# https://mise.jdx.dev/configuration.html
+# =============================================================================
+
+[settings]
+experimental = true
+always_keep_download = false
+always_keep_install = false
+legacy_version_file = true
+plugin_autoupdate_last_check_duration = "7 days"
+verbose = false
+
+[tools]
+node = "lts"
+python = "3.12"
+ruby = "3.3"
+go = "latest"

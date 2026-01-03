@@ -1,0 +1,51 @@
+# =============================================================================
+# sheldon plugins configuration
+# https://sheldon.cli.rs/
+# =============================================================================
+
+shell = "zsh"
+
+# -----------------------------------------------------------------------------
+# Deferred loading template
+# -----------------------------------------------------------------------------
+[templates]
+defer = """{% for file in files %}
+zsh-defer source "{{ file }}"
+{% endfor %}"""
+
+# -----------------------------------------------------------------------------
+# Core plugins (load immediately)
+# -----------------------------------------------------------------------------
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+[plugins.zsh-async]
+github = "mafredri/zsh-async"
+
+[plugins.pure]
+github = "sindresorhus/pure"
+
+# -----------------------------------------------------------------------------
+# Completions
+# -----------------------------------------------------------------------------
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+
+# -----------------------------------------------------------------------------
+# Deferred plugins (load after prompt)
+# -----------------------------------------------------------------------------
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+apply = ["defer"]
+
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
+apply = ["defer"]
+
+[plugins.zsh-history-substring-search]
+github = "zsh-users/zsh-history-substring-search"
+apply = ["defer"]
+
+[plugins.zsh-256color]
+github = "chrissicool/zsh-256color"
+apply = ["defer"]

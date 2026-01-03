@@ -1,0 +1,24 @@
+# =============================================================================
+# Global gitignore
+# =============================================================================
+
+# macOS
+.DS_Store
+*~
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Language version files (managed by mise)
+.ruby-version
+.node-version
+.python-version
+.tool-versions
+
+# Build outputs
+target/
+
+# Personal notes
+z/
