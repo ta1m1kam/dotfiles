@@ -3,8 +3,8 @@
 # =============================================================================
 
 [user]
-    name = {{ .name | default "TaigaMikami" }}
-    email = {{ .email | default "mikamimikami60@gmail.com" }}
+    name = {{ if hasKey . "name" }}{{ .name }}{{ else }}TaigaMikami{{ end }}
+    email = {{ if hasKey . "email" }}{{ .email }}{{ else }}mikamimikami60@gmail.com{{ end }}
 
 [color]
     ui = true
