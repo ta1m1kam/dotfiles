@@ -1,6 +1,6 @@
 Include {{ .chezmoi.homeDir }}/.colima/ssh_config
 
-{{- if .work }}
+{{- if and (hasKey . "work") .work }}
 
 Host bastion-dev
   HostName i-0619bd21479c37272
