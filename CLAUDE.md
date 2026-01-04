@@ -71,11 +71,11 @@ dotfiles/
 | カテゴリ | ツール | 用途 |
 |---------|--------|------|
 | dotfiles管理 | chezmoi | テンプレート・暗号化対応 |
-| 言語バージョン管理 | mise | Node.js, Python, Ruby, Go |
+| 言語バージョン管理 | mise | Node.js, Python, Ruby, Go, npm グローバルパッケージ |
 | zshプラグイン管理 | sheldon | pure, autosuggestions, syntax-highlighting |
 | ファジーファインダー | fzf | ファイル検索、履歴検索 |
 | リポジトリ管理 | ghq | Gitリポジトリの一元管理 |
-| Git UI | tig, gitui | TUIベースのGit操作 |
+| Git UI | tig, gitui, lazygit | TUIベースのGit操作 |
 | ファイルマネージャー | yazi | Vim風TUIファイルマネージャー |
 | タスクランナー | just | Makefile代替 |
 | プロセス表示 | procs | ps代替（カラフル表示） |
@@ -97,6 +97,10 @@ dotfiles/
 | `jf` | - | just レシピを fzf で選択実行 |
 | `pk` | - | procs + fzf でプロセス kill |
 | `gu` | - | gitui 起動（エイリアス） |
+| `lg` | - | lazygit 起動（エイリアス） |
+| `gpr` | - | fzf で PR 選択して checkout |
+| `gprv` | - | fzf で PR 選択してブラウザ表示 |
+| `gis` | - | fzf で Issue 選択してブラウザ表示 |
 
 詳細は README.md を参照。
 

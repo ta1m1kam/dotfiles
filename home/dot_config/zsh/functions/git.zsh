@@ -50,3 +50,35 @@ function gadd() {
     git status -s
   fi
 }
+
+# gh (GitHub CLI) + fzf functions
+
+function gpr() {
+  local pr
+  pr=$(gh pr list --limit 50 | \
+    fzf --preview 'echo {} | awk "{print \$1}" | xargs gh pr view' | \
+    awk '{print $1}')
+  if [[ -n "$pr" ]]; then
+    gh pr checkout "$pr"
+  fi
+}
+
+function gprv() {
+  local pr
+  pr=$(gh pr list --limit 50 --state all | \
+    fzf --preview 'echo {} | awk "{print \$1}" | xargs gh pr view' | \
+    awk '{print $1}')
+  if [[ -n "$pr" ]]; then
+    gh pr view "$pr" --web
+  fi
+}
+
+function gis() {
+  local issue
+  issue=$(gh issue list --limit 50 | \
+    fzf --preview 'echo {} | awk "{print \$1}" | xargs gh issue view' | \
+    awk '{print $1}')
+  if [[ -n "$issue" ]]; then
+    gh issue view "$issue" --web
+  fi
+}

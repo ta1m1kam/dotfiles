@@ -56,6 +56,7 @@ brew "topgrade"       # 全ツール一括アップデート
 brew "gh"
 brew "ghq"
 brew "tig"
+brew "lazygit"
 
 # -----------------------------------------------------------------------------
 # Formulae - Development Languages

@@ -1,6 +1,6 @@
 # ghq + fzf functions
 
-function repo() {
+function grepo() {
   local dir
   dir=$(ghq list -p | fzf --preview 'bat --color=always --style=header,grid --line-range :80 {}/README.md 2>/dev/null || ls -la {}')
   if [[ -n "$dir" ]]; then
@@ -17,5 +17,5 @@ function repo-browse() {
 }
 
 function get() {
-  ghq get "$1" && repo
+  ghq get "$1" && grepo
 }
