@@ -17,35 +17,35 @@ zsh-defer source "{{ file }}"
 # Core plugins (load immediately)
 # -----------------------------------------------------------------------------
 [plugins.zsh-defer]
-github = "romkatv/zsh-defer"
+git = "https://github.com/romkatv/zsh-defer.git"
 
 [plugins.zsh-async]
-github = "mafredri/zsh-async"
+git = "https://github.com/mafredri/zsh-async.git"
 
 [plugins.pure]
-github = "sindresorhus/pure"
+git = "https://github.com/sindresorhus/pure.git"
 
 # -----------------------------------------------------------------------------
 # Completions
 # -----------------------------------------------------------------------------
 [plugins.zsh-completions]
-github = "zsh-users/zsh-completions"
+git = "https://github.com/zsh-users/zsh-completions.git"
 
 # -----------------------------------------------------------------------------
 # Deferred plugins (load after prompt)
 # -----------------------------------------------------------------------------
 [plugins.zsh-autosuggestions]
-github = "zsh-users/zsh-autosuggestions"
+git = "https://github.com/zsh-users/zsh-autosuggestions.git"
 apply = ["defer"]
 
 [plugins.zsh-syntax-highlighting]
-github = "zsh-users/zsh-syntax-highlighting"
+git = "https://github.com/zsh-users/zsh-syntax-highlighting.git"
 apply = ["defer"]
 
 [plugins.zsh-history-substring-search]
-github = "zsh-users/zsh-history-substring-search"
+git = "https://github.com/zsh-users/zsh-history-substring-search.git"
 apply = ["defer"]
 
 [plugins.zsh-256color]
-github = "chrissicool/zsh-256color"
+git = "https://github.com/chrissicool/zsh-256color.git"
 apply = ["defer"]
