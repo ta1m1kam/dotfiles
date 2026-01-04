@@ -10,9 +10,13 @@ always_keep_install = false
 legacy_version_file = true
 plugin_autoupdate_last_check_duration = "7 days"
 verbose = false
+idiomatic_version_file_enable_tools = ["node"]
 
 [tools]
 node = "lts"
 python = "3.12"
 ruby = "3.3"
 go = "latest"
+
+# npm global packages
+"npm:gitmoji-cli" = "latest"

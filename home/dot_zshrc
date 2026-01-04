@@ -150,7 +150,21 @@ alias od='open ~/Desktop'
 alias gs='git status'
 alias gd='git diff'
 alias ga='git add'
-alias gc='gitmoji -c'
+alias gaa='git add -A'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gp='git push'
+alias gpl='git pull'
+alias gco='git checkout'
+alias gl='git log --oneline -20'
+alias gst='git stash'
+alias gm='gitmoji -c'
+
+# -----------------------------------------------------------------------------
+# Git TUI
+# -----------------------------------------------------------------------------
+alias gu='gitui'
+alias lg='lazygit'
 
 # -----------------------------------------------------------------------------
 # Docker
@@ -184,7 +198,7 @@ done
 # =============================================================================
 
 # Ctrl+G: ghq + fzf でリポジトリ移動
-bindkey -s '^g' 'repo\n'
+bindkey -s '^g' 'grepo\n'
 
 # Ctrl+F: fzf でファイル検索
 bindkey -s '^f' 'vf\n'
@@ -192,8 +206,8 @@ bindkey -s '^f' 'vf\n'
 # Ctrl+B: fzf でブランチ切り替え
 bindkey -s '^b' 'gb\n'
 
-# Ctrl+J: zoxide でディレクトリ検索
-bindkey -s '^j' 'zf\n'
+# Ctrl+]: zoxide でディレクトリ検索
+bindkey -s '^]' 'zf\n'
 
 # Ctrl+H: カレントディレクトリの履歴検索
 bindkey -s '^h' 'hd\n'
