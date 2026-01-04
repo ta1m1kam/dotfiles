@@ -2,10 +2,6 @@
 
 ![](https://github.com/TaigaMikami/dotfiles/workflows/macos/badge.svg)
 
-<div align="center">
-  <img src="https://pbs.twimg.com/profile_images/877083522850201600/TtN6ZbNY_400x400.jpg">
-</div>
-
 macOS用のdotfiles管理リポジトリ。chezmoi, mise, sheldon, fzf, ghq, tig などのモダンなCLIツールを活用した開発環境を構築します。
 
 ## セットアップ
