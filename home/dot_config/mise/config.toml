@@ -17,6 +17,13 @@ node = "lts"
 python = "3.12"
 ruby = "3.3"
 go = "latest"
+pnpm = "latest"
 
 # npm global packages
 "npm:gitmoji-cli" = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
+"npm:vercel" = "latest"
+"npm:wrangler" = "latest"
+"npm:@expo/ngrok" = "latest"
+"npm:@google/generative-ai" = "latest"
+"npm:tailwindcss" = "latest"
