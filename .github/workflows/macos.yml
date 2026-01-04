@@ -23,13 +23,8 @@ jobs:
         run: |
           chezmoi init --source $PWD --apply
 
-      - name: Setup sheldon
-        env:
-          GIT_TERMINAL_PROMPT: 0
-        run: |
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git config --global credential.helper ""
-          sheldon lock
+      - name: Verify sheldon
+        run: sheldon --version
 
       - name: Install mise tools
         run: mise install
