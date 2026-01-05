@@ -72,7 +72,9 @@ function gwta() {
     worktree_path="${wt_dir}/${branch_name}"
     git worktree add "$worktree_path" "$base_branch"
   else
-    worktree_path="${wt_dir}/${branch_name}"
+    # ブランチ名の / を - に変換してディレクトリ名にする
+    local dir_name="${branch_name//\//-}"
+    worktree_path="${wt_dir}/${dir_name}"
     git worktree add -b "$branch_name" "$worktree_path" "$base_branch"
   fi
 
@@ -294,7 +296,9 @@ function gwtcn() {
     base_branch=$(_gwt_main_branch)
   fi
 
-  worktree_path="${wt_dir}/${branch_name}"
+  # ブランチ名の / を - に変換してディレクトリ名にする
+  local dir_name="${branch_name//\//-}"
+  worktree_path="${wt_dir}/${dir_name}"
   git worktree add -b "$branch_name" "$worktree_path" "$base_branch"
 
   if [[ $? -eq 0 ]]; then
