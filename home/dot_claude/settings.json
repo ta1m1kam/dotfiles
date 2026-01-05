@@ -23,7 +23,9 @@
       "Bash(chezmoi apply:*)",
       "Bash(chezmoi init:*)",
       "Bash(chezmoi diff:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git worktree:*)",
+      "Bash(tmux:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
