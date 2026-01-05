@@ -124,9 +124,6 @@ cask "google-chrome"
 # Casks - Terminals
 # -----------------------------------------------------------------------------
 cask "ghostty"
-cask "iterm2"
-cask "warp"
-cask "wezterm"
 
 # -----------------------------------------------------------------------------
 # Casks - Editors & IDEs
