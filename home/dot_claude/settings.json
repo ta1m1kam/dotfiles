@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(rg:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(git restore:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr review:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(git rebase:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(sheldon:*)",
+      "Bash(chezmoi apply:*)",
+      "Bash(chezmoi init:*)",
+      "Bash(chezmoi diff:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "defaultMode": "acceptEdits"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "example-skills@anthropic-agent-skills": true,
+    "feature-dev@claude-plugins-official": true
+  }
+}
