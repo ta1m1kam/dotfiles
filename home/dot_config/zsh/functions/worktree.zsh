@@ -56,9 +56,10 @@ function gwta() {
   mkdir -p "$wt_dir"
 
   base_branch=$(git branch -a --sort=-committerdate | \
+    sed 's/^[* ]*//' | \
     fzf --header "Select base branch" \
-        --preview 'git log --oneline {1} | head -20' | \
-    sed 's/^[* ]*//' | sed 's/remotes\/origin\///')
+        --preview 'git log --oneline {} 2>/dev/null | head -20' | \
+    sed 's/remotes\/origin\///')
 
   if [[ -z "$base_branch" ]]; then
     return 0
@@ -70,18 +71,28 @@ function gwta() {
   if [[ -z "$branch_name" ]]; then
     branch_name="${base_branch##*/}"
     worktree_path="${wt_dir}/${branch_name}"
-    git worktree add "$worktree_path" "$base_branch"
+    echo "Creating worktree: $worktree_path (branch: $base_branch)"
+    if git worktree add "$worktree_path" "$base_branch"; then
+      cd "$worktree_path"
+      zoxide add "$worktree_path"
+      echo "Created worktree: $worktree_path"
+    else
+      echo "Failed to create worktree"
+      return 1
+    fi
   else
     # ブランチ名の / を - に変換してディレクトリ名にする
     local dir_name="${branch_name//\//-}"
     worktree_path="${wt_dir}/${dir_name}"
-    git worktree add -b "$branch_name" "$worktree_path" "$base_branch"
-  fi
-
-  if [[ $? -eq 0 ]]; then
-    cd "$worktree_path"
-    zoxide add "$worktree_path"
-    echo "Created worktree: $worktree_path"
+    echo "Creating worktree: $worktree_path (new branch: $branch_name from $base_branch)"
+    if git worktree add -b "$branch_name" "$worktree_path" "$base_branch"; then
+      cd "$worktree_path"
+      zoxide add "$worktree_path"
+      echo "Created worktree: $worktree_path"
+    else
+      echo "Failed to create worktree"
+      return 1
+    fi
   fi
 }
 
@@ -288,9 +299,10 @@ function gwtcn() {
   fi
 
   base_branch=$(git branch -a --sort=-committerdate | \
+    sed 's/^[* ]*//' | \
     fzf --header "Select base branch" \
-        --preview 'git log --oneline {1} | head -20' | \
-    sed 's/^[* ]*//' | sed 's/remotes\/origin\///')
+        --preview 'git log --oneline {} 2>/dev/null | head -20' | \
+    sed 's/remotes\/origin\///')
 
   if [[ -z "$base_branch" ]]; then
     base_branch=$(_gwt_main_branch)
