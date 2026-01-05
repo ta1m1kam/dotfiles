@@ -22,3 +22,6 @@ target/
 
 # Personal notes
 z/
+
+# Git worktrees
+.worktrees/

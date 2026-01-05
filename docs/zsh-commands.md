@@ -163,6 +163,80 @@ gprv                 # PR一覧 → 選択 → ブラウザで開く
 gis                  # Issue一覧 → 選択 → ブラウザで開く
 ```
 
+### Git Worktree + fzf 関連
+
+複数ブランチでの並行開発、PRレビュー、Claude Code連携に便利なworktree管理関数。
+worktreeは各リポジトリの `.worktrees/` ディレクトリに作成されます。
+
+**基本操作:**
+
+| 関数 | 説明 |
+|------|------|
+| `gwt` | worktree を fzf で選択して移動 |
+| `gwta` | 新規 worktree を作成（ブランチ選択 or 新規作成） |
+| `gwtr` | worktree を fzf で選択して削除（複数選択可） |
+| `gwts` | 全 worktree のステータス一覧を表示 |
+
+```bash
+gwt                  # worktree選択 → 移動
+gwta                 # ブランチ選択 → 新規worktree作成
+gwtr                 # worktree選択 → 削除
+gwts                 # ステータス一覧表示
+```
+
+**PR/Issue 連携:**
+
+| 関数 | 説明 |
+|------|------|
+| `gwtpr` | PR を fzf で選択して worktree でチェックアウト |
+| `gwtfix` | main/master から hotfix 用 worktree を作成 |
+
+```bash
+gwtpr                # PR選択 → worktreeでcheckout
+gwtfix               # hotfix名入力 → worktree作成
+```
+
+**tmux 連携:**
+
+| 関数 | 説明 |
+|------|------|
+| `gwtt` | worktree を選択して tmux セッション作成/アタッチ |
+
+```bash
+gwtt                 # worktree選択 → tmuxセッション
+```
+
+**Claude Code 連携:**
+
+| 関数 | 説明 |
+|------|------|
+| `gwtc` | worktree を選択して Claude Code を起動 |
+| `gwtcn` | 新規 worktree を作成して Claude Code を起動 |
+
+```bash
+gwtc                 # worktree選択 → Claude Code起動
+gwtcn                # 新規worktree作成 → Claude Code起動
+```
+
+**ユーティリティ:**
+
+| 関数 | 説明 |
+|------|------|
+| `gwtz` | zoxide 履歴から Git リポジトリを選択して移動 |
+
+```bash
+gwtz                 # zoxide履歴 → gitリポジトリ選択 → 移動
+```
+
+**Git エイリアス:**
+
+| エイリアス | 展開先 |
+|-----------|--------|
+| `git wl` | `git worktree list` |
+| `git wa` | `git worktree add` |
+| `git wr` | `git worktree remove` |
+| `git wp` | `git worktree prune` |
+
 ### peco 関連
 
 | 関数 | 説明 |
@@ -433,6 +507,7 @@ topgrade -y       # 確認なしで実行
 | `ghq.zsh` | ghq + fzf 連携（`grepo`, `repo-browse`, `get`） |
 | `fzf.zsh` | fzf + ripgrep 連携（`rgf`, `vf`, `cdf`） |
 | `git.zsh` | fzf + Git/GitHub CLI 連携（`gb`, `gshow`, `gcp`, `gstash`, `gadd`, `gpr`, `gprv`, `gis`） |
+| `worktree.zsh` | Git Worktree 連携（`gwt`, `gwta`, `gwtr`, `gwts`, `gwtpr`, `gwtfix`, `gwtt`, `gwtc`, `gwtcn`, `gwtz`） |
 | `docker.zsh` | Docker 関連（`dex`, `drmi`） |
 | `zoxide.zsh` | zoxide + fzf 連携（`zf`, `zrm`, `zs`, `zcd`） |
 | `atuin.zsh` | atuin + fzf 連携（`hd`, `hs`, `hstats`） |
