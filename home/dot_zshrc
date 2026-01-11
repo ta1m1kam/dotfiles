@@ -9,6 +9,12 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # -----------------------------------------------------------------------------
+# aqua (CLI version manager)
+# -----------------------------------------------------------------------------
+export AQUA_GLOBAL_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/aqua/aqua.yaml"
+export PATH="${AQUA_ROOT_DIR:-$HOME/.local/share/aquaproj-aqua}/bin:$PATH"
+
+# -----------------------------------------------------------------------------
 # sheldon (plugin manager)
 # -----------------------------------------------------------------------------
 eval "$(sheldon source)"
@@ -211,3 +217,11 @@ bindkey -s '^]' 'zf\n'
 
 # Ctrl+H: カレントディレクトリの履歴検索
 bindkey -s '^h' 'hd\n'
+
+# pnpm
+export PNPM_HOME="/Users/taiga.mikami.001/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
