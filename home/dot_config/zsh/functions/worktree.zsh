@@ -10,7 +10,15 @@ function _gwt_dir() {
   local root
   root=$(git rev-parse --show-toplevel 2>/dev/null)
   if [[ -n "$root" ]]; then
-    echo "${root}/.worktrees"
+    dirname "$root"
+  fi
+}
+
+function _gwt_repo_name() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [[ -n "$root" ]]; then
+    basename "$root"
   fi
 }
 
@@ -45,15 +53,14 @@ function gwt() {
 }
 
 function gwta() {
-  local branch_name base_branch worktree_path wt_dir
+  local branch_name base_branch worktree_path wt_dir repo_name
   wt_dir=$(_gwt_dir)
+  repo_name=$(_gwt_repo_name)
 
   if [[ -z "$wt_dir" ]]; then
     echo "Not in a git repository"
     return 1
   fi
-
-  mkdir -p "$wt_dir"
 
   base_branch=$(git branch -a --sort=-committerdate | \
     sed 's/^[* ]*//' | \
@@ -70,7 +77,8 @@ function gwta() {
 
   if [[ -z "$branch_name" ]]; then
     branch_name="${base_branch##*/}"
-    worktree_path="${wt_dir}/${branch_name}"
+    local dir_name="${branch_name//\//-}"
+    worktree_path="${wt_dir}/${repo_name}-${dir_name}"
     echo "Creating worktree: $worktree_path (branch: $base_branch)"
     if git worktree add "$worktree_path" "$base_branch"; then
       cd "$worktree_path"
@@ -83,7 +91,7 @@ function gwta() {
   else
     # ブランチ名の / を - に変換してディレクトリ名にする
     local dir_name="${branch_name//\//-}"
-    worktree_path="${wt_dir}/${dir_name}"
+    worktree_path="${wt_dir}/${repo_name}-${dir_name}"
     echo "Creating worktree: $worktree_path (new branch: $branch_name from $base_branch)"
     if git worktree add -b "$branch_name" "$worktree_path" "$base_branch"; then
       cd "$worktree_path"
@@ -144,15 +152,14 @@ function gwts() {
 # -----------------------------------------------------------------------------
 
 function gwtpr() {
-  local pr pr_number branch_name worktree_path wt_dir
+  local pr pr_number branch_name worktree_path wt_dir repo_name
   wt_dir=$(_gwt_dir)
+  repo_name=$(_gwt_repo_name)
 
   if [[ -z "$wt_dir" ]]; then
     echo "Not in a git repository"
     return 1
   fi
-
-  mkdir -p "$wt_dir"
 
   pr=$(gh pr list --limit 50 | \
     fzf --preview 'echo {} | awk "{print \$1}" | xargs gh pr view')
@@ -163,7 +170,7 @@ function gwtpr() {
 
   pr_number=$(echo "$pr" | awk '{print $1}')
   branch_name=$(gh pr view "$pr_number" --json headRefName -q '.headRefName')
-  worktree_path="${wt_dir}/pr-${pr_number}"
+  worktree_path="${wt_dir}/${repo_name}-pr-${pr_number}"
 
   git fetch origin "pull/${pr_number}/head:${branch_name}" 2>/dev/null || \
     git fetch origin "${branch_name}"
@@ -178,15 +185,14 @@ function gwtpr() {
 }
 
 function gwtfix() {
-  local fix_name worktree_path wt_dir main_branch
+  local fix_name worktree_path wt_dir main_branch repo_name
   wt_dir=$(_gwt_dir)
+  repo_name=$(_gwt_repo_name)
 
   if [[ -z "$wt_dir" ]]; then
     echo "Not in a git repository"
     return 1
   fi
-
-  mkdir -p "$wt_dir"
 
   echo -n "Hotfix name (e.g., fix-login-bug): "
   read -r fix_name
@@ -197,7 +203,7 @@ function gwtfix() {
   fi
 
   main_branch=$(_gwt_main_branch)
-  worktree_path="${wt_dir}/hotfix-${fix_name}"
+  worktree_path="${wt_dir}/${repo_name}-hotfix-${fix_name}"
 
   git fetch origin "$main_branch"
   git worktree add -b "hotfix/${fix_name}" "$worktree_path" "origin/${main_branch}"
@@ -280,15 +286,14 @@ function gwtc() {
 }
 
 function gwtcn() {
-  local branch_name base_branch worktree_path wt_dir
+  local branch_name base_branch worktree_path wt_dir repo_name
   wt_dir=$(_gwt_dir)
+  repo_name=$(_gwt_repo_name)
 
   if [[ -z "$wt_dir" ]]; then
     echo "Not in a git repository"
     return 1
   fi
-
-  mkdir -p "$wt_dir"
 
   echo -n "New feature branch name: "
   read -r branch_name
@@ -310,7 +315,7 @@ function gwtcn() {
 
   # ブランチ名の / を - に変換してディレクトリ名にする
   local dir_name="${branch_name//\//-}"
-  worktree_path="${wt_dir}/${dir_name}"
+  worktree_path="${wt_dir}/${repo_name}-${dir_name}"
   git worktree add -b "$branch_name" "$worktree_path" "$base_branch"
 
   if [[ $? -eq 0 ]]; then
