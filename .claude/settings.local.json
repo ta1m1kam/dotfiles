@@ -5,7 +5,10 @@
       "Bash(chezmoi apply:*)",
       "Bash(chezmoi init:*)",
       "Bash(chezmoi diff:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "mcp__shepherd__text_to_speech",
+      "mcp__shepherd__notion_create_pages",
+      "mcp__shepherd__notion_fetch"
     ]
   }
 }

@@ -25,3 +25,6 @@ z/
 
 # Git worktrees
 .worktrees/
+
+# Claude Code worktrees
+.claude/worktrees/

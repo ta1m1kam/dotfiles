@@ -3,8 +3,8 @@
 # =============================================================================
 
 [user]
-    name = {{ if hasKey . "name" }}{{ .name }}{{ else }}TaigaMikami{{ end }}
-    email = {{ if hasKey . "email" }}{{ .email }}{{ else }}mikamimikami60@gmail.com{{ end }}
+    name = {{ if hasKey . "name" }}{{ .name }}{{ else }}Your Name{{ end }}
+    email = {{ if hasKey . "email" }}{{ .email }}{{ else }}you@example.com{{ end }}
 
 [color]
     ui = true
@@ -28,8 +28,12 @@
     insteadOf = https://github.com/
 
 {{- if (and (hasKey . "work") .work) }}
-[url "ssh://git@github.com/YourOrg/"]
-    insteadOf = https://github.com/YourOrg/
+{{- /* Set WORK_GITHUB_ORG env var to rewrite https://github.com/<ORG>/ to ssh */}}
+{{- $org := env "WORK_GITHUB_ORG" }}
+{{- if $org }}
+[url "ssh://git@github.com/{{ $org }}/"]
+    insteadOf = https://github.com/{{ $org }}/
+{{- end }}
 {{- end }}
 
 [filter "lfs"]

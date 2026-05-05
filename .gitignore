@@ -1,2 +1,5 @@
 .DS_Store
 .vim/plugged
+
+# 内部インフラ情報を含むSSHテンプレート (publicリポジトリのため除外)
+home/private_dot_ssh/

@@ -19,12 +19,6 @@ zsh-defer source "{{ file }}"
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
-[plugins.zsh-async]
-github = "mafredri/zsh-async"
-
-[plugins.pure]
-github = "sindresorhus/pure"
-
 # -----------------------------------------------------------------------------
 # Completions
 # -----------------------------------------------------------------------------

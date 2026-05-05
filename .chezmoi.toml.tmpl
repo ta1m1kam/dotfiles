@@ -4,10 +4,7 @@
 # =============================================================================
 
 [data]
-    name = "TaigaMikami"
-    email = "mikamimikami60@gmail.com"
-{{- if or (eq .chezmoi.hostname "G9XGW0FWND") (contains "workorg" .chezmoi.hostname) (contains "taiga" .chezmoi.hostname) }}
-    work = true
-{{- else }}
-    work = false
-{{- end }}
+    name = {{ env "GIT_NAME" | default "Your Name" | quote }}
+    email = {{ env "GIT_EMAIL" | default "you@example.com" | quote }}
+    # Set WORK_MACHINE=1 in your shell env to enable work-specific configs
+    work = {{ if env "WORK_MACHINE" }}true{{ else }}false{{ end }}

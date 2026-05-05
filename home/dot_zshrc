@@ -20,9 +20,9 @@ export PATH="${AQUA_ROOT_DIR:-$HOME/.local/share/aquaproj-aqua}/bin:$PATH"
 eval "$(sheldon source)"
 
 # -----------------------------------------------------------------------------
-# Pure prompt style
+# starship prompt
 # -----------------------------------------------------------------------------
-zstyle ':prompt:pure:path' color cyan
+eval "$(starship init zsh)"
 
 # -----------------------------------------------------------------------------
 # Environment
@@ -135,18 +135,19 @@ alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
 alias ..='cd ..'
-alias ls='ls -G'
-alias la='ls -a'
-alias ll='ls -l'
-alias tree='tree -C'
+alias ls='eza --git'
+alias la='eza -la --git'
+alias ll='eza -l --git'
+alias lt='eza --tree --level=2 --git-ignore'
+alias tree='eza --tree --git-ignore'
 alias mkdir='mkdir -p'
 alias cat='bat'
-export LSCOLORS=Cxfxcxdxbxegedabagacad
 
 # -----------------------------------------------------------------------------
 # Editor
 # -----------------------------------------------------------------------------
-alias vi='vim'
+alias vi='nvim'
+alias vim='nvim'
 alias f='open .'
 alias od='open ~/Desktop'
 
@@ -208,7 +209,7 @@ done
 # Key bindings
 # =============================================================================
 
-# Ctrl+G: ghq + fzf でリポジトリ移動
+# Ctrl+G: ghq + roots + fzf でリポジトリ移動
 bindkey -s '^g' 'grepo\n'
 
 # Ctrl+F: fzf でファイル検索
@@ -224,7 +225,7 @@ bindkey -s '^]' 'zf\n'
 bindkey -s '^h' 'hd\n'
 
 # pnpm
-export PNPM_HOME="/Users/taiga.mikami.001/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
