@@ -63,6 +63,7 @@ brew "ghq"
 brew "tig"
 brew "lazygit"
 brew "k1low/tap/roots"    # ghq + fzf のルートナビゲーション
+brew "k1low/tap/mo"       # Markdown ブラウザプレビュー（ライブリロード）
 brew "d-kuro/tap/gwq"     # git worktree を ghq 風に管理
 
 # -----------------------------------------------------------------------------
