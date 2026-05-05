@@ -1,9 +1,9 @@
 #!/bin/zsh
 # launchd plist の bootstrap を chezmoi apply 時に再実行する
 # 以下のハッシュが変わったときに再実行される
-# tom-doerr-url-to-x-post.plist hash: {{ include "Library/LaunchAgents/com.claude.schedule.tom-doerr-url-to-x-post.plist.tmpl" | sha256sum }}
+# tom-doerr-url-to-x-post.plist hash: {{ include "private_Library/private_LaunchAgents/com.claude.schedule.tom-doerr-url-to-x-post.plist.tmpl" | sha256sum }}
 # tom-doerr-url-to-x-post run-scheduler.sh hash: {{ include "dot_claude/schedules/tom-doerr-url-to-x-post/executable_run-scheduler.sh" | sha256sum }}
-# ob-daily-log.plist hash: {{ include "Library/LaunchAgents/com.claude.schedule.ob-daily-log.plist.tmpl" | sha256sum }}
+# ob-daily-log.plist hash: {{ include "private_Library/private_LaunchAgents/com.claude.schedule.ob-daily-log.plist.tmpl" | sha256sum }}
 # ob-daily-log run-scheduler.sh hash: {{ include "dot_claude/schedules/ob-daily-log/executable_run-scheduler.sh" | sha256sum }}
 
 set -eu
