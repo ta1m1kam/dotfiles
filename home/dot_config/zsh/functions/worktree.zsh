@@ -36,16 +36,15 @@ function _gwt_main_branch() {
 
 function gwt() {
   local worktree
-  worktree=$(git worktree list | \
+  worktree=$(gwq list -g 2>/dev/null | \
     fzf --preview '
-      dir=$(echo {} | awk "{print \$1}")
-      cd "$dir" 2>/dev/null && {
+      cd {} 2>/dev/null && {
         echo "Branch: $(git branch --show-current)"
         echo "Latest: $(git log -1 --format="%h %s")"
         echo "---"
         git status -s | head -20
       }
-    ' | awk '{print $1}')
+    ')
   if [[ -n "$worktree" ]]; then
     cd "$worktree"
     zoxide add "$worktree"
@@ -53,11 +52,9 @@ function gwt() {
 }
 
 function gwta() {
-  local branch_name base_branch worktree_path wt_dir repo_name
-  wt_dir=$(_gwt_dir)
-  repo_name=$(_gwt_repo_name)
+  local branch_name base_branch wt_path
 
-  if [[ -z "$wt_dir" ]]; then
+  if ! git rev-parse --show-toplevel &>/dev/null; then
     echo "Not in a git repository"
     return 1
   fi
@@ -67,61 +64,45 @@ function gwta() {
     fzf --header "Select base branch" \
         --preview 'git log --oneline {} 2>/dev/null | head -20' | \
     sed 's/remotes\/origin\///')
-
-  if [[ -z "$base_branch" ]]; then
-    return 0
-  fi
+  [[ -z "$base_branch" ]] && return 0
 
   echo -n "New branch name (empty to checkout existing): "
   read -r branch_name
 
   if [[ -z "$branch_name" ]]; then
-    branch_name="${base_branch##*/}"
-    local dir_name="${branch_name//\//-}"
-    worktree_path="${wt_dir}/${repo_name}-${dir_name}"
-    echo "Creating worktree: $worktree_path (branch: $base_branch)"
-    if git worktree add "$worktree_path" "$base_branch"; then
-      cd "$worktree_path"
-      zoxide add "$worktree_path"
-      echo "Created worktree: $worktree_path"
-    else
-      echo "Failed to create worktree"
-      return 1
-    fi
+    gwq add "$base_branch"
+    wt_path=$(gwq list -g 2>/dev/null | grep "=${base_branch##*/}$" | head -1)
   else
-    # ブランチ名の / を - に変換してディレクトリ名にする
-    local dir_name="${branch_name//\//-}"
-    worktree_path="${wt_dir}/${repo_name}-${dir_name}"
-    echo "Creating worktree: $worktree_path (new branch: $branch_name from $base_branch)"
-    if git worktree add -b "$branch_name" "$worktree_path" "$base_branch"; then
-      cd "$worktree_path"
-      zoxide add "$worktree_path"
-      echo "Created worktree: $worktree_path"
-    else
-      echo "Failed to create worktree"
-      return 1
-    fi
+    git fetch origin "$base_branch" 2>/dev/null || true
+    git branch "$branch_name" "origin/${base_branch}" 2>/dev/null || \
+      git branch "$branch_name" "$base_branch"
+    gwq add "$branch_name"
+    wt_path=$(gwq list -g 2>/dev/null | grep "=${branch_name//\//-}$" | head -1)
+  fi
+
+  if [[ -n "$wt_path" ]]; then
+    cd "$wt_path"
+    zoxide add "$wt_path"
   fi
 }
 
 function gwtr() {
   local worktree
-  worktree=$(git worktree list | grep -v "$(git rev-parse --show-toplevel)$" | \
+  worktree=$(gwq list -g 2>/dev/null | \
     fzf -m --preview '
-      dir=$(echo {} | awk "{print \$1}")
-      cd "$dir" 2>/dev/null && {
+      cd {} 2>/dev/null && {
         echo "This worktree will be removed"
         echo "---"
         echo "Branch: $(git branch --show-current)"
         echo "Uncommitted changes:"
         git status -s
       }
-    ' | awk '{print $1}')
+    ')
 
   if [[ -n "$worktree" ]]; then
     echo "$worktree" | while read -r dir; do
       echo "Removing: $dir"
-      git worktree remove "$dir"
+      gwq remove -g "$dir"
       zoxide remove "$dir" 2>/dev/null
     done
   fi
@@ -263,10 +244,9 @@ function gwtt() {
 
 function gwtc() {
   local worktree
-  worktree=$(git worktree list | \
+  worktree=$(gwq list -g 2>/dev/null | \
     fzf --preview '
-      dir=$(echo {} | awk "{print \$1}")
-      cd "$dir" 2>/dev/null && {
+      cd {} 2>/dev/null && {
         echo "Claude Code workspace"
         echo "---"
         echo "Branch: $(git branch --show-current)"
@@ -277,7 +257,7 @@ function gwtc() {
           head -20 CLAUDE.md
         fi
       }
-    ' | awk '{print $1}')
+    ')
 
   if [[ -n "$worktree" ]]; then
     cd "$worktree"
@@ -286,42 +266,30 @@ function gwtc() {
 }
 
 function gwtcn() {
-  local branch_name base_branch worktree_path wt_dir repo_name
-  wt_dir=$(_gwt_dir)
-  repo_name=$(_gwt_repo_name)
+  local branch_name base_branch wt_path
 
-  if [[ -z "$wt_dir" ]]; then
+  if ! git rev-parse --show-toplevel &>/dev/null; then
     echo "Not in a git repository"
     return 1
   fi
 
   echo -n "New feature branch name: "
   read -r branch_name
+  [[ -z "$branch_name" ]] && return 1
 
-  if [[ -z "$branch_name" ]]; then
-    echo "Branch name required"
-    return 1
-  fi
-
-  base_branch=$(git branch -a --sort=-committerdate | \
-    sed 's/^[* ]*//' | \
+  base_branch=$(git branch -a --sort=-committerdate | sed 's/^[* ]*//' | \
     fzf --header "Select base branch" \
         --preview 'git log --oneline {} 2>/dev/null | head -20' | \
     sed 's/remotes\/origin\///')
+  [[ -z "$base_branch" ]] && base_branch=$(_gwt_main_branch)
 
-  if [[ -z "$base_branch" ]]; then
-    base_branch=$(_gwt_main_branch)
-  fi
+  gwq add -b "$branch_name" "$base_branch"
+  wt_path=$(gwq list -g 2>/dev/null | grep "=${branch_name//\//-}$" | head -1)
 
-  # ブランチ名の / を - に変換してディレクトリ名にする
-  local dir_name="${branch_name//\//-}"
-  worktree_path="${wt_dir}/${repo_name}-${dir_name}"
-  git worktree add -b "$branch_name" "$worktree_path" "$base_branch"
-
-  if [[ $? -eq 0 ]]; then
-    cd "$worktree_path"
-    zoxide add "$worktree_path"
-    echo "Starting Claude Code in: $worktree_path"
+  if [[ -n "$wt_path" ]]; then
+    cd "$wt_path"
+    zoxide add "$wt_path"
+    echo "Starting Claude Code in: $wt_path"
     claude
   fi
 }

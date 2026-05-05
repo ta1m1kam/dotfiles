@@ -6,6 +6,8 @@
 # Taps
 # -----------------------------------------------------------------------------
 tap "aws/tap"
+tap "k1low/tap"
+tap "d-kuro/tap"
 # tap "homebrew/bundle"  # deprecated
 # tap "koekeishiya/formulae"  # yabai (CI環境で利用不可)
 
@@ -24,6 +26,7 @@ brew "pstree"
 # -----------------------------------------------------------------------------
 # Formulae - Shell & Search
 # -----------------------------------------------------------------------------
+brew "starship"
 brew "fzf"
 brew "peco"
 brew "ripgrep"
@@ -49,6 +52,8 @@ brew "dust"           # du代替（ディスク使用量可視化）
 brew "sd"             # sed代替（検索・置換）
 brew "xh"             # curl代替（HTTPクライアント）
 brew "topgrade"       # 全ツール一括アップデート
+brew "git-delta"      # git diff viewer
+brew "eza"            # ls代替（カラフル表示）
 
 # -----------------------------------------------------------------------------
 # Formulae - Git & Repository
@@ -57,6 +62,8 @@ brew "gh"
 brew "ghq"
 brew "tig"
 brew "lazygit"
+brew "k1low/tap/roots"    # ghq + fzf のルートナビゲーション
+brew "d-kuro/tap/gwq"     # git worktree を ghq 風に管理
 
 # -----------------------------------------------------------------------------
 # Formulae - Development Languages
