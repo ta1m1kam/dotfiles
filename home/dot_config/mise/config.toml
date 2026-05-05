@@ -12,5 +12,7 @@ plugin_autoupdate_last_check_duration = "7 days"
 verbose = false
 
 [tools]
+node = "lts"
 python = "3.12"
 ruby = "3.3"
+"npm:defuddle" = "latest"

@@ -18,5 +18,8 @@ export PGDATA=/usr/local/var/postgres
 export PATH="$HOME/.yarn/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 
+# mise shims (for non-interactive shells where mise activate isn't loaded)
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
 # Snowflake CLI
 export PATH="/Applications/SnowflakeCLI.app/Contents/MacOS:$PATH"
