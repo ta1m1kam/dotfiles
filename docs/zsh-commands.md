@@ -19,7 +19,7 @@
 
 | キー | 関数 | 説明 |
 |------|------|------|
-| `Ctrl+G` | `grepo` | ghq + fzf でリポジトリに移動 |
+| `Ctrl+G` | `grepo` | ghq + roots + gwq + fzf でリポジトリ/worktree統合移動 |
 | `Ctrl+F` | `vf` | fzf でファイルを選択して vim で開く |
 | `Ctrl+B` | `gb` | fzf で Git ブランチを切り替え |
 | `Ctrl+]` | `zf` | zoxide + fzf でディレクトリに移動 |
@@ -46,18 +46,22 @@
 | `rm` | `rm -i` | 削除前に確認 |
 | `mv` | `mv -i` | 移動前に確認 |
 | `cp` | `cp -i` | コピー前に確認 |
-| `ls` | `ls -G` | カラー表示付き一覧 |
-| `la` | `ls -a` | 隠しファイル含む一覧 |
-| `ll` | `ls -l` | 詳細一覧 |
-| `tree` | `tree -C` | カラー表示付きツリー |
+| `ls` | `eza --git` | eza によるカラー表示 + Gitステータス |
+| `la` | `eza -la --git` | 隠しファイル含む詳細一覧 |
+| `ll` | `eza -l --git` | 詳細一覧（Gitステータス列付き） |
+| `lt` | `eza --tree --level=2 --git-ignore` | 2階層ツリー（.gitignore尊重） |
+| `tree` | `eza --tree --git-ignore` | フルツリー |
 | `mkdir` | `mkdir -p` | 中間ディレクトリも作成 |
 | `cat` | `bat` | シンタックスハイライト付きファイル表示 |
+
+> 素の `ls` を使いたい場合は `command ls` または `\ls`
 
 ### エディター
 
 | エイリアス | 展開先 | 説明 |
 |-----------|--------|------|
-| `vi` | `vim` | vim を起動 |
+| `vi` | `nvim` | Neovim を起動 |
+| `vim` | `nvim` | Neovim を起動 |
 | `f` | `open .` | Finder でカレントディレクトリを開く |
 | `od` | `open ~/Desktop` | Finder でデスクトップを開く |
 
@@ -103,11 +107,11 @@
 
 ## カスタム関数
 
-### ghq + fzf 関連
+### ghq + roots + gwq + fzf 関連
 
 | 関数 | 説明 |
 |------|------|
-| `grepo` | リポジトリを fzf で選択して移動（プレビュー: README.md） |
+| `grepo` | ghq管理リポジトリ + モノレポのサブパッケージ + gwq worktreeを統合してfzfで選択（プレビュー: README.md） |
 | `repo-browse` | リポジトリを選択して GitHub をブラウザで開く |
 | `get <url>` | ghq get でクローンし、そのディレクトリに移動 |
 
@@ -116,6 +120,10 @@ grepo             # Ctrl+G でも可
 repo-browse
 get user/repo
 ```
+
+`grepo` は内部的に以下を統合：
+- `ghq list --full-path | roots` … モノレポ内の `package.json` / `go.mod` / `Cargo.toml` 検出パッケージを展開
+- `gwq list` … gwq で管理中のworktreeパスも候補に含める
 
 ### fzf + ripgrep 関連
 
@@ -163,18 +171,18 @@ gprv                 # PR一覧 → 選択 → ブラウザで開く
 gis                  # Issue一覧 → 選択 → ブラウザで開く
 ```
 
-### Git Worktree + fzf 関連
+### Git Worktree + gwq + fzf 関連
 
 複数ブランチでの並行開発、PRレビュー、Claude Code連携に便利なworktree管理関数。
-worktreeは各リポジトリの `.worktrees/` ディレクトリに作成されます。
+worktreeは [gwq](https://github.com/d-kuro/gwq) によって `~/ghq/<host>/<owner>/<repo>=<branch>` 形式で集中管理されます。
 
 **基本操作:**
 
 | 関数 | 説明 |
 |------|------|
-| `gwt` | worktree を fzf で選択して移動 |
-| `gwta` | 新規 worktree を作成（ブランチ選択 or 新規作成） |
-| `gwtr` | worktree を fzf で選択して削除（複数選択可） |
+| `gwt` | gwq管理worktreeを fzf で選択して移動 |
+| `gwta` | 新規 worktree を作成（ブランチ選択 or 新規作成、内部で `gwq add`） |
+| `gwtr` | worktree を fzf で選択して削除（内部で `gwq remove`、`trash`で安全削除） |
 | `gwts` | 全 worktree のステータス一覧を表示 |
 
 ```bash
@@ -307,12 +315,104 @@ tr            # refs 一覧
 
 | 関数 | 説明 |
 |------|------|
-| `yo` | Obsidian ディレクトリを参照して Claude Code を起動 |
-| `oo` | Obsidian ディレクトリに移動 |
+| `yo` | Obsidian vault (`$OBSIDIAN_VAULT_DIR`) を参照して Claude Code を起動 |
+| `oo` | Obsidian vault に移動 |
+
+`OBSIDIAN_VAULT_DIR` を環境変数で指定（未設定時は `$HOME/Documents/obsidian`）：
+
+```bash
+export OBSIDIAN_VAULT_DIR="$HOME/path/to/your/vault"
+```
+
+### aqua 連携
+
+| 関数 | 説明 |
+|------|------|
+| `_aqua_auto_policy_allow` | `chpwd` フックで `aqua-policy.yaml` を検出すると自動的に `aqua policy allow` を実行 |
 
 ---
 
 ## モダン CLI ツール 使い方
+
+### starship（プロンプト）
+
+高速・最小設定のクロスシェルプロンプト。設定は `~/.config/starship.toml`。
+
+```bash
+starship --version
+starship explain      # 表示中モジュールの内訳
+starship preset --list  # 利用可能なプリセット一覧
+```
+
+**現在の構成（最小）:**
+
+```
+~/dotfiles on  master [!2?1]
+❯
+```
+
+- ディレクトリ（フルパス、`truncation_length = 0`）
+- Gitブランチ + ステータス記号（`!`変更/`?`未追跡/`⇡`ahead/`⇣`behind）
+- コマンド時間（2秒以上のみ）
+- 失敗時は `❯` が赤
+- 言語バージョン・Docker・AWS等のモジュールは無効化済み（必要に応じて `disabled = false` に）
+
+### eza（ls 代替）
+
+```bash
+ls                # eza --git
+ll                # eza -l --git
+la                # eza -la --git
+lt                # eza --tree --level=2 --git-ignore
+tree              # eza --tree --git-ignore
+
+eza --icons       # Nerd Fontアイコン付き
+eza -l --git-ignore --no-permissions  # 列を間引く
+```
+
+### delta（git diff viewer）
+
+`~/.gitconfig` に設定済みのため、`git diff` / `git show` / `git log -p` で自動的に side-by-side 表示。
+
+```bash
+git diff HEAD~3 HEAD       # delta 経由で side-by-side
+git log -p -3              # コミットごとの diff
+git show HEAD              # 単一コミット
+```
+
+`navigate = true` 設定により、ページャー内で `n` / `N` でファイル/hunk間を移動可能。
+
+### roots（モノレポrootの抽出）
+
+ghq管理リポジトリの中から、`package.json` / `go.mod` / `Cargo.toml` などのプロジェクトマーカーを持つディレクトリを抽出。
+
+```bash
+ghq list --full-path | roots          # 全ghqリポジトリ + サブパッケージ
+ghq list --full-path | roots | fzf    # fzf統合（grepo関数の中身）
+```
+
+### gwq（git worktree manager）
+
+git worktree を ghq風に集中管理。`~/ghq/<host>/<owner>/<repo>=<branch>` 形式で配置。
+
+```bash
+gwq list                  # 全worktree一覧
+gwq add <branch>          # 新規worktree作成（既存ブランチから）
+gwq add -b <new> <base>   # 新規ブランチでworktree作成
+gwq remove <path>         # 削除（trash経由で安全に）
+```
+
+設定は `~/.config/gwq/config.toml`：
+
+```toml
+[naming]
+template = '{{.Host}}/{{.Owner}}/{{.Repository}}={{.Branch}}'
+
+[worktree]
+basedir = '~/ghq'
+```
+
+`~/.gitconfig` の `[wt] remover = trash` により、worktree削除時にゴミ箱送りになる。
 
 ### yazi（ファイルマネージャー）
 
@@ -504,10 +604,10 @@ topgrade -y       # 確認なしで実行
 
 | ファイル | 内容 |
 |---------|------|
-| `ghq.zsh` | ghq + fzf 連携（`grepo`, `repo-browse`, `get`） |
+| `ghq.zsh` | ghq + roots + gwq 連携（`grepo`, `repo-browse`, `get`） |
 | `fzf.zsh` | fzf + ripgrep 連携（`rgf`, `vf`, `cdf`） |
 | `git.zsh` | fzf + Git/GitHub CLI 連携（`gb`, `gshow`, `gcp`, `gstash`, `gadd`, `gpr`, `gprv`, `gis`） |
-| `worktree.zsh` | Git Worktree 連携（`gwt`, `gwta`, `gwtr`, `gwts`, `gwtpr`, `gwtfix`, `gwtt`, `gwtc`, `gwtcn`, `gwtz`） |
+| `worktree.zsh` | gwq + Git Worktree 連携（`gwt`, `gwta`, `gwtr`, `gwts`, `gwtpr`, `gwtfix`, `gwtt`, `gwtc`, `gwtcn`, `gwtz`） |
 | `docker.zsh` | Docker 関連（`dex`, `drmi`） |
 | `zoxide.zsh` | zoxide + fzf 連携（`zf`, `zrm`, `zs`, `zcd`） |
 | `atuin.zsh` | atuin + fzf 連携（`hd`, `hs`, `hstats`） |
@@ -517,7 +617,8 @@ topgrade -y       # 確認なしで実行
 | `just.zsh` | just + fzf 連携（`jf`, `je`） |
 | `procs.zsh` | procs + fzf 連携（`pk`, `pk9`, `pw`, `pt`） |
 | `modern-cli.zsh` | その他モダンツール（`duf`, `bench`, `sdr`, `xj` など） |
-| `custom.zsh` | 個人用カスタム関数 |
+| `aqua.zsh` | aqua の policy auto-allow（`chpwd` フック） |
+| `custom.zsh` | 個人用カスタム関数（`yo`, `oo`） |
 
 ---
 
@@ -542,8 +643,13 @@ fzf 使用中に利用できる共通キー:
 
 | ツール | 用途 |
 |--------|------|
+| [starship](https://starship.rs/) | シェルプロンプト |
 | [fzf](https://github.com/junegunn/fzf) | ファジーファインダー |
 | [ghq](https://github.com/x-motemen/ghq) | リポジトリ管理 |
+| [roots](https://github.com/k1LoW/roots) | プロジェクトroot抽出（モノレポ展開） |
+| [gwq](https://github.com/d-kuro/gwq) | git worktree manager |
+| [eza](https://github.com/eza-community/eza) | ls 代替（カラー + Gitステータス） |
+| [delta](https://github.com/dandavison/delta) | git diff viewer |
 | [ripgrep (rg)](https://github.com/BurntSushi/ripgrep) | 高速検索 |
 | [bat](https://github.com/sharkdp/bat) | シンタックスハイライト付き cat |
 | [peco](https://github.com/peco/peco) | インタラクティブフィルタリング |
@@ -562,3 +668,4 @@ fzf 使用中に利用できる共通キー:
 | [sd](https://github.com/chmln/sd) | 検索・置換 |
 | [xh](https://github.com/ducaale/xh) | HTTP クライアント |
 | [topgrade](https://github.com/topgrade-rs/topgrade) | 一括更新 |
+| [aqua](https://aquaproj.github.io/) | 宣言的 CLI バージョン管理 |
