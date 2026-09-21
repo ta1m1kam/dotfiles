@@ -35,14 +35,13 @@ macOS 用の dotfiles。chezmoi, mise, sheldon, starship, fzf, ghq, eza, delta �
 
 1Password が未設定のマシンでは `~/.ssh/config` は chezmoi の管理対象外になり、既存ファイルを上書きしません。
 
-一度空で答えた質問は再度聞かれません。後から設定するときは prompt 文をキーにして渡します。
+一度答えた質問は再度聞かれません (空で答えた場合も同じ)。後から変えるときは `~/.config/chezmoi/chezmoi.toml` の `[data]` を直接編集して `mise run apply` します。
 
-```bash
-chezmoi init --source ~/dotfiles \
-  --promptString "1Password account for secrets (e.g. my.1password.com, empty to skip)=my.1password.com" \
-  --promptString "1Password vault holding dotfiles secrets (empty to skip)=Private" \
-  --promptString "Private agents repo cloned to ~/.agents (git URL, empty to skip)=git@github.com:ta1m1kam/agents.git"
-mise run apply
+```toml
+[data]
+    onepassword_account = "my.1password.com"
+    onepassword_vault = "Personal"
+    agents_repo = "git@github.com:ta1m1kam/agents.git"
 ```
 
 ### bootstrap 後に手動でやること
