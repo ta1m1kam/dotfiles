@@ -24,8 +24,11 @@
 [commit]
     template = ~/.gitmessage.txt
 
+{{- /* CI には SSH 鍵がないので https のまま clone させる */}}
+{{- if not (env "CI") }}
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
+{{- end }}
 
 {{- if and .work .work_github_org }}
 [url "ssh://git@github.com/{{ .work_github_org }}/"]
