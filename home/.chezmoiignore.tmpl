@@ -38,3 +38,8 @@ LICENSE
 
 # Machine-specific shell overrides
 .zshrc.local
+
+# 仕事用 SSH 設定は 1Password から読む。未設定のマシンでは既存の ~/.ssh/config を上書きしない
+{{ if not (and .work .onepassword_vault) -}}
+.ssh/config
+{{- end }}

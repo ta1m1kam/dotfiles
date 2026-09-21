@@ -11,7 +11,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # -----------------------------------------------------------------------------
 # aqua (プロジェクト側の aqua.yaml でインストールされる CLI の PATH)
 # -----------------------------------------------------------------------------
-export PATH="${AQUA_ROOT_DIR:-$HOME/.local/share/aquaproj-aqua}/bin:$PATH"
+export PATH="$PATH:${AQUA_ROOT_DIR:-$HOME/.local/share/aquaproj-aqua}/bin"
 
 # -----------------------------------------------------------------------------
 # sheldon (plugin manager)
@@ -28,6 +28,7 @@ eval "$(starship init zsh)"
 # -----------------------------------------------------------------------------
 export LC_CTYPE=UTF-8
 export EDITOR=vim
+export OBSIDIAN_VAULT_DIR="{{ .obsidian_vault_dir }}"
 
 # -----------------------------------------------------------------------------
 # Completion
@@ -200,6 +201,10 @@ alias -g G='| grep'
 # Functions (loaded from ~/.config/zsh/functions/)
 # =============================================================================
 for f in ~/.config/zsh/functions/*.zsh(N); do
+  source "$f"
+done
+# 非公開リポジトリ (~/.agents) 側の関数
+for f in ~/.agents/zsh/*.zsh(N); do
   source "$f"
 done
 

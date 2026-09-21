@@ -28,3 +28,7 @@ z/
 
 # Claude Code worktrees
 .claude/worktrees/
+
+# AI agent local files
+**/.claude/settings.local.json
+**/CLAUDE.local.md

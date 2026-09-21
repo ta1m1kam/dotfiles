@@ -1,0 +1,35 @@
+# =============================================================================
+# chezmoi configuration
+# https://www.chezmoi.io/reference/configuration-file/
+# 初回の `chezmoi init` で対話入力し、~/.config/chezmoi/chezmoi.toml に保存される
+# 非対話 (CI など) では --promptString / --promptBool で渡す
+# =============================================================================
+{{ $name := promptStringOnce . "name" "Git user name" -}}
+{{- $email := promptStringOnce . "email" "Git email" -}}
+{{- $work := promptBoolOnce . "work" "Is this a work machine (y/n)" -}}
+{{- $workGithubOrg := "" -}}
+{{- $workRepoDir := "" -}}
+{{- $onepasswordAccount := "" -}}
+{{- $onepasswordVault := "" -}}
+{{- $zedGoLsp := "" -}}
+{{- if $work -}}
+{{-   $workGithubOrg = promptStringOnce . "work_github_org" "Work GitHub org (https -> ssh rewrite target)" -}}
+{{-   $workRepoDir = promptStringOnce . "work_repo_dir" "Work main repo path (used by Raycast selection-to-claude)" -}}
+{{-   $onepasswordAccount = promptStringOnce . "onepassword_account" "1Password account for secrets (e.g. my.1password.com, empty to skip)" "" -}}
+{{-   $onepasswordVault = promptStringOnce . "onepassword_vault" "1Password vault holding dotfiles secrets (empty to skip)" "" -}}
+{{-   $zedGoLsp = promptStringOnce . "zed_go_lsp" "Go LSP binary in ~/go/bin used by Zed instead of gopls (empty to skip)" "" -}}
+{{- end -}}
+{{- $obsidianVaultDir := promptStringOnce . "obsidian_vault_dir" "Obsidian vault directory" (joinPath .chezmoi.homeDir "Records") -}}
+{{- $agentsRepo := promptStringOnce . "agents_repo" "Private agents repo cloned to ~/.agents (git URL, empty to skip)" "" -}}
+
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
+    work = {{ $work }}
+    work_github_org = {{ $workGithubOrg | quote }}
+    work_repo_dir = {{ $workRepoDir | quote }}
+    obsidian_vault_dir = {{ $obsidianVaultDir | quote }}
+    onepassword_account = {{ $onepasswordAccount | quote }}
+    onepassword_vault = {{ $onepasswordVault | quote }}
+    agents_repo = {{ $agentsRepo | quote }}
+    zed_go_lsp = {{ $zedGoLsp | quote }}

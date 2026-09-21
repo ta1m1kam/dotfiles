@@ -1,0 +1,5 @@
+Include {{ .chezmoi.homeDir }}/.colima/ssh_config
+{{ if and .work .onepassword_vault }}
+# 仕事用の Host 定義は 1Password の Secure Note "dotfiles-ssh-config-work" から読み込む
+{{ onepasswordRead (printf "op://%s/dotfiles-ssh-config-work/notesPlain" .onepassword_vault) .onepassword_account }}
+{{- end }}

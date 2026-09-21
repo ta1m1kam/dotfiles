@@ -20,9 +20,10 @@ ruby = "3.3"
 go = "latest"
 rust = "stable"
 
-# パッケージマネージャ
+# パッケージマネージャ / ランタイム
 pnpm = "latest"
 uv = "latest"
+bun = "latest"
 
 # AI エージェント
 claude-code = "latest"

@@ -1,25 +1,31 @@
 # =============================================================================
 # mise tasks
 # 言語ランタイムと CLI の宣言は home/dot_config/mise/config.toml に集約
+# 新しい Mac では bootstrap.sh がこのファイルの install タスクを呼ぶ
 # =============================================================================
 
-[tasks.setup]
-description = "Setup development environment"
+[tasks.install]
+description = "Full installation (brew + chezmoi + sheldon + mise + editors). Re-runnable."
 run = """
 #!/bin/bash
-set -e
+set -euo pipefail
+DOTFILES="$HOME/dotfiles"
 
 echo "==> Installing Homebrew packages..."
-brew bundle --file=~/dotfiles/Brewfile
+brew bundle --file="$DOTFILES/Brewfile"
 
 echo "==> Applying dotfiles with chezmoi..."
-chezmoi init --source ~/dotfiles --apply
+if [ -f "$HOME/.config/chezmoi/chezmoi.toml" ]; then
+  chezmoi apply --source "$DOTFILES"
+else
+  chezmoi init --source "$DOTFILES" --apply
+fi
 
 echo "==> Setting up sheldon..."
 sheldon lock --update
 
-echo "==> Setting up mise..."
-mise install
+echo "==> Installing mise tools..."
+mise install --yes
 
 echo "==> Installing bat theme..."
 mkdir -p "$(bat --config-dir)/themes"
@@ -27,104 +33,103 @@ curl -sL -o "$(bat --config-dir)/themes/Catppuccin-mocha.tmTheme" \
   https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme
 bat cache --build
 
-echo "==> Setup complete!"
+echo "==> Starting brew services..."
+brew services start felixkratz/formulae/borders >/dev/null 2>&1 || true
+
+echo "==> Installing Neovim plugins (LazyVim)..."
+nvim --headless "+Lazy! restore" +qa >/dev/null 2>&1 || echo "    (nvim plugin restore skipped)"
+
+echo "==> Cloning Obsidian vault if configured..."
+VAULT="$(chezmoi data --source "$DOTFILES" --format json | jq -r '.obsidian_vault_dir // empty')"
+if [ -n "$VAULT" ] && [ ! -d "$VAULT" ]; then
+  git clone git@github.com:ta1m1kam/obsidian.git "$VAULT" || echo "    (Obsidian clone skipped: ssh key not registered yet?)"
+fi
+
+echo "==> Installation complete!"
+echo "==> Restart your shell, then see README 'After bootstrap' for the manual steps."
 """
 
 [tasks.apply]
 description = "Apply dotfiles with chezmoi"
-run = """
-#!/bin/bash
-set -e
+run = "chezmoi apply --source ~/dotfiles"
 
-chezmoi apply --source ~/dotfiles
-echo "==> Dotfiles applied!"
-"""
+[tasks.diff]
+description = "Show diff between source and destination"
+run = "chezmoi diff --source ~/dotfiles"
+
+[tasks.edit]
+description = "Edit dotfiles source"
+run = 'chezmoi edit --source ~/dotfiles "$@"'
 
 [tasks.update]
 description = "Update all tools"
 run = """
 #!/bin/bash
-set -e
-
+set -euo pipefail
 echo "==> Updating Homebrew..."
 brew update && brew upgrade
-
-echo "==> Updating mise..."
-mise upgrade
-
+echo "==> Updating mise tools..."
+mise upgrade --yes
 echo "==> Updating sheldon plugins..."
 sheldon lock --update
-
 echo "==> Updating dotfiles..."
 chezmoi update --source ~/dotfiles
-
 echo "==> Update complete!"
 """
 
-[tasks.diff]
-description = "Show diff between source and destination"
+[tasks.link-agents]
+description = "Clone ~/.agents (private) and symlink skills into Claude Code / Codex"
+run = "~/.config/dotfiles/link-agents"
+
+[tasks.ghq-save]
+description = "Save the ghq repository list to ~/.agents/ghq-list.txt"
 run = """
 #!/bin/bash
-chezmoi diff --source ~/dotfiles
+set -euo pipefail
+ghq list > ~/.agents/ghq-list.txt
+echo "==> $(wc -l < ~/.agents/ghq-list.txt | tr -d ' ') repositories saved (commit it in ~/.agents)"
 """
 
-[tasks.edit]
-description = "Edit dotfiles source"
+[tasks.ghq-restore]
+description = "Clone every repository listed in ~/.agents/ghq-list.txt"
 run = """
 #!/bin/bash
-chezmoi edit --source ~/dotfiles "$@"
+set -euo pipefail
+LIST=~/.agents/ghq-list.txt
+[ -f "$LIST" ] || { echo "$LIST not found. Run 'mise run link-agents' first."; exit 1; }
+while read -r repo; do
+  [ -n "$repo" ] && ghq get "$repo" || true
+done < "$LIST"
 """
 
-[tasks.install]
-description = "Full installation (brew + chezmoi + mise + sheldon)"
+[tasks.doctor]
+description = "Check that the shell and core tools work"
 run = """
 #!/bin/bash
-set -e
-
-echo "==> Installing Homebrew packages..."
-brew bundle --file=~/dotfiles/Brewfile
-
-echo "==> Initializing chezmoi..."
-chezmoi init --source ~/dotfiles --apply
-
-echo "==> Setting up sheldon..."
-sheldon lock --update
-
-echo "==> Setting up mise..."
-mise install
-
-echo "==> Installing bat theme..."
-mkdir -p "$(bat --config-dir)/themes"
-curl -sL -o "$(bat --config-dir)/themes/Catppuccin-mocha.tmTheme" \
-  https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme
-bat cache --build
-
-echo "==> Installation complete!"
-echo "==> Please restart your shell or run: source ~/.zshrc"
+set -u
+zsh -ilc 'echo "zsh: ok"' || echo "zsh: FAILED"
+for c in chezmoi mise sheldon starship fzf rg bat eza ghq gwq atuin zoxide nvim gh op claude; do
+  if command -v "$c" >/dev/null 2>&1; then echo "$c: $(command -v "$c")"; else echo "$c: MISSING"; fi
+done
 """
 
 [tasks.clean]
-description = "Remove old version managers (rbenv, nvm, pyenv)"
+description = "Remove leftovers from old tooling (version managers, unused brew packages)"
 run = """
 #!/bin/bash
-set -e
-
-echo "==> This will remove rbenv, nvm, and pyenv directories."
+set -u
+echo "==> This removes rbenv/nvm/pyenv/asdf directories and old brew packages."
 read -p "Are you sure? (y/N): " confirm
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-  echo "Aborted."
-  exit 0
-fi
-
-echo "==> Removing ~/.rbenv..."
-rm -rf ~/.rbenv
-
-echo "==> Removing ~/.nvm..."
-rm -rf ~/.nvm
-
-echo "==> Removing ~/.pyenv..."
-rm -rf ~/.pyenv
-
+[[ "$confirm" =~ ^[yY]$ ]] || { echo "Aborted."; exit 0; }
+rm -rf ~/.rbenv ~/.nvm ~/.pyenv ~/.asdf ~/.gvm ~/.zplug
+for f in asdf nodebrew pyenv rbenv jenv node@20 koekeishiya/formulae/yabai; do
+  brew list "$f" >/dev/null 2>&1 && brew uninstall --ignore-dependencies "$f" || true
+done
+for c in alacritty rancher ubersicht swiftbar; do
+  brew list --cask "$c" >/dev/null 2>&1 && brew uninstall --cask "$c" || true
+done
+echo "==> Removing npm-global claude (mise's claude-code is the managed one)..."
+npm uninstall -g @anthropic-ai/claude-code >/dev/null 2>&1 || true
+mise prune --yes >/dev/null 2>&1 || true
 echo "==> Cleanup complete!"
-echo "==> Note: You may also want to run 'brew uninstall rbenv ruby-build pyenv' if installed via Homebrew."
 """

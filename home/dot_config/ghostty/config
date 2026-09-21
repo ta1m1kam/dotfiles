@@ -1,0 +1,11 @@
+# フォント (Brewfile の font-jetbrains-mono-nerd-font)
+font-family = JetBrainsMono Nerd Font
+
+# フォントサイズ (デフォルトは 13)
+font-size = 15
+
+# nvim の catppuccin と統一感のあるテーマ
+theme = Catppuccin Mocha
+
+# Secure Input の自動有効化を切る (Raycast の Hyper Key が無効化されるため)
+macos-auto-secure-input = false
