@@ -22,6 +22,9 @@ else
 fi
 
 echo "==> Setting up sheldon..."
+if [ -f "$HOME/.ssh/id_ed25519" ] && ! ssh-add -l 2>/dev/null | grep -q ed25519; then
+  ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519" || true
+fi
 sheldon lock --update
 
 echo "==> Installing mise tools..."

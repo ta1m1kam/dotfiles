@@ -121,7 +121,7 @@ brew "felixkratz/formulae/borders"  # アクティブウィンドウの枠線 (b
 # Casks - Browsers
 # -----------------------------------------------------------------------------
 cask "arc"
-cask "google-chrome"
+# google-chrome は会社の Jamf が配布するため Brewfile では管理しない
 
 # -----------------------------------------------------------------------------
 # Casks - Terminals
@@ -153,7 +153,7 @@ cask "mitmproxy"
 cask "chatgpt"
 cask "claude"
 cask "codex"
-cask "linear-linear"
+cask "linear"
 cask "deepl"
 cask "obsidian"
 cask "raycast"
@@ -163,8 +163,7 @@ cask "raycast"
 # -----------------------------------------------------------------------------
 cask "discord"
 cask "gather"
-cask "slack"
-cask "zoom"
+# slack / zoom は会社の Jamf が配布するため Brewfile では管理しない
 
 # -----------------------------------------------------------------------------
 # Casks - Utilities
