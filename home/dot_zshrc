@@ -9,9 +9,8 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # -----------------------------------------------------------------------------
-# aqua (CLI version manager)
+# aqua (プロジェクト側の aqua.yaml でインストールされる CLI の PATH)
 # -----------------------------------------------------------------------------
-export AQUA_GLOBAL_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/aqua/aqua.yaml"
 export PATH="${AQUA_ROOT_DIR:-$HOME/.local/share/aquaproj-aqua}/bin:$PATH"
 
 # -----------------------------------------------------------------------------
