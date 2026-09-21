@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 set main-view = id:yes date:default,local=yes author:abbreviated commit-title:graph=yes,refs=yes,overflow=no
 set blame-view = date:default id:yes,color line-number:yes,interval=1 text
-set diff-view = text:yes,commit-title-overflow=no line-number:yes
+set diff-view = line-number:yes text:yes,commit-title-overflow=no
 set pager-view = text
 set stage-view = text
 set log-view = text

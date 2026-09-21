@@ -10,13 +10,12 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # -----------------------------------------------------------------------------
 # PostgreSQL
 # -----------------------------------------------------------------------------
-export PGDATA=/usr/local/var/postgres
+export PGDATA=/opt/homebrew/var/postgresql@15
 
 # -----------------------------------------------------------------------------
 # PATH additions
 # -----------------------------------------------------------------------------
 export PATH="$HOME/.yarn/bin:$PATH"
-export PATH="/usr/local/bin:$PATH"
 
 # mise shims (for non-interactive shells where mise activate isn't loaded)
 export PATH="$HOME/.local/share/mise/shims:$PATH"

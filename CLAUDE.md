@@ -111,7 +111,7 @@ dotfiles/
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # 2. dotfilesクローン
-git clone https://github.com/TaigaMikami/dotfiles.git ~/dotfiles
+git clone https://github.com/ta1m1kam/dotfiles.git ~/dotfiles
 
 # 3. セットアップ実行
 cd ~/dotfiles

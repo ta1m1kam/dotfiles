@@ -4,7 +4,12 @@
 # ob-daily-log.plist hash: {{ include "private_Library/private_LaunchAgents/com.claude.schedule.ob-daily-log.plist.tmpl" | sha256sum }}
 # ob-daily-log run-scheduler.sh hash: {{ include "dot_claude/schedules/ob-daily-log/executable_run-scheduler.sh" | sha256sum }}
 
-set -eu
+set -u
+
+if [ -n "${CI:-}" ]; then
+  echo "[claude-schedules] skip on CI"
+  exit 0
+fi
 
 UID_NUM="$(id -u)"
 DOMAIN="gui/$UID_NUM"
@@ -14,6 +19,6 @@ for plist in "$HOME/Library/LaunchAgents/com.claude.schedule."*.plist; do
   label="$(basename "$plist" .plist)"
   echo "[claude-schedules] reload: $label"
   launchctl bootout "$DOMAIN/$label" 2>/dev/null || true
-  launchctl bootstrap "$DOMAIN" "$plist"
+  launchctl bootstrap "$DOMAIN" "$plist" || echo "[claude-schedules] bootstrap failed: $label (continuing)"
   launchctl enable "$DOMAIN/$label" 2>/dev/null || true
 done

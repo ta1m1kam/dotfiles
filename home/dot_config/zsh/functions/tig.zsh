@@ -20,6 +20,6 @@ function ts() {
   tig stash
 }
 
-function tr() {
+function trf() {
   tig refs
 }
