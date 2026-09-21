@@ -41,6 +41,10 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
   ssh-keygen -t ed25519 -C "$(whoami)@$(hostname -s)" -f "$HOME/.ssh/id_ed25519"
   gh ssh-key add "$HOME/.ssh/id_ed25519.pub" --title "$(hostname -s)"
 fi
+# libgit2 系ツール (sheldon など) は ssh-agent の鍵しか使えないので登録しておく
+if ! ssh-add -l 2>/dev/null | grep -q ed25519; then
+  ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519"
+fi
 # github.com のホスト鍵を登録しておく (未登録だと後続の git clone が確認待ちで止まる)
 if ! ssh-keygen -F github.com >/dev/null 2>&1; then
   ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
