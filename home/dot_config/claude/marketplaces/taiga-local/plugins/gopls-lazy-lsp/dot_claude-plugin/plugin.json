@@ -1,0 +1,19 @@
+{
+  "name": "gopls-lazy-lsp",
+  "description": "gopls を gopls-lazy (open file に遅延スコープする gopls プロキシ) で置き換える Go LSP",
+  "version": "1.0.0",
+  "author": {
+    "name": "Taiga Mikami"
+  },
+  "lspServers": {
+    "go": {
+      "command": "gopls-lazy",
+      "args": [
+        "serve"
+      ],
+      "extensionToLanguage": {
+        ".go": "go"
+      }
+    }
+  }
+}

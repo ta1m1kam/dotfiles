@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "taiga-local",
+  "description": "個人用ローカルプラグイン",
+  "owner": {
+    "name": "Taiga Mikami"
+  },
+  "plugins": [
+    {
+      "name": "gopls-lazy-lsp",
+      "source": "./plugins/gopls-lazy-lsp",
+      "category": "development"
+    }
+  ]
+}

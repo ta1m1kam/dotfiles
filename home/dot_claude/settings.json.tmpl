@@ -66,9 +66,18 @@
     "defaultMode": "acceptEdits"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": false,
     "example-skills@anthropic-agent-skills": true,
-    "feature-dev@claude-plugins-official": true
+    "feature-dev@claude-plugins-official": true,
+    "gopls-lazy-lsp@taiga-local": true
+  },
+  "extraKnownMarketplaces": {
+    "taiga-local": {
+      "source": {
+        "source": "directory",
+        "path": "{{ .chezmoi.homeDir }}/.config/claude/marketplaces/taiga-local"
+      }
+    }
   },
   "model": "opus",
   "plansDirectory": "./z"
