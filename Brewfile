@@ -5,9 +5,10 @@
 # -----------------------------------------------------------------------------
 # Taps
 # -----------------------------------------------------------------------------
-tap "aws/tap"
-tap "k1low/tap"
-tap "d-kuro/tap"
+# Homebrew 7 以降、非公式 tap は trusted 指定がないと読み込まれない
+tap "k1low/tap", trusted: true
+tap "d-kuro/tap", trusted: true
+tap "felixkratz/formulae", trusted: true
 # tap "homebrew/bundle"  # deprecated
 # tap "koekeishiya/formulae"  # yabai (CI環境で利用不可)
 
@@ -30,12 +31,14 @@ brew "starship"
 brew "fzf"
 brew "peco"
 brew "ripgrep"
+brew "fd"
 brew "the_silver_searcher"
 brew "bat"
 brew "atuin"
 brew "zoxide"
 brew "direnv"
 brew "jq"
+brew "terminal-notifier"  # Claude Code の通知 hook で使用
 brew "sheldon"
 brew "chezmoi"
 
@@ -67,20 +70,16 @@ brew "k1low/tap/mo"       # Markdown ブラウザプレビュー（ライブリ�
 brew "d-kuro/tap/gwq"     # git worktree を ghq 風に管理
 
 # -----------------------------------------------------------------------------
-# Formulae - Development Languages
+# Formulae - Development Tools
 # -----------------------------------------------------------------------------
-brew "go"
+brew "aqua"  # プロジェクト側の aqua.yaml 用 (グローバルのツール管理は mise)
 brew "golangci-lint"
 brew "protobuf"
 brew "sqlc"
 
 # -----------------------------------------------------------------------------
-# Formulae - Version Managers (mise移行後に削除予定)
+# Formulae - Version Manager (言語ランタイムと CLI は mise で管理)
 # -----------------------------------------------------------------------------
-# brew "rbenv"
-# brew "ruby-build"
-# brew "pyenv"
-# brew "nodebrew"
 brew "mise"
 
 # -----------------------------------------------------------------------------
@@ -104,7 +103,6 @@ brew "docker-credential-helper"
 # Formulae - Cloud & Infrastructure
 # -----------------------------------------------------------------------------
 brew "awscli"
-brew "aws/tap/aws-sam-cli"
 brew "azure-cli"
 # brew "terraform"  # tfenv で管理
 brew "tfenv"
@@ -112,15 +110,12 @@ brew "tfenv"
 # -----------------------------------------------------------------------------
 # Formulae - Media & Misc
 # -----------------------------------------------------------------------------
-brew "ffmpeg"
-brew "hugo"
 brew "act"  # GitHub Actions local runner
-brew "wireshark"
 
 # -----------------------------------------------------------------------------
 # Formulae - Window Manager
 # -----------------------------------------------------------------------------
-# brew "yabai"  # CI環境で利用不可
+brew "felixkratz/formulae/borders"  # アクティブウィンドウの枠線 (brew services で起動)
 
 # -----------------------------------------------------------------------------
 # Casks - Browsers
@@ -132,25 +127,22 @@ cask "google-chrome"
 # Casks - Terminals
 # -----------------------------------------------------------------------------
 cask "ghostty"
+cask "cmux"
 
 # -----------------------------------------------------------------------------
 # Casks - Editors & IDEs
 # -----------------------------------------------------------------------------
-cask "cursor"
-cask "visual-studio-code"
+cask "zed"
 cask "goland"
 
 # -----------------------------------------------------------------------------
 # Casks - Database Tools
 # -----------------------------------------------------------------------------
-cask "dbeaver-community"
-cask "db-browser-for-sqlite"
 cask "sequel-ace"
 
 # -----------------------------------------------------------------------------
 # Casks - Development Tools
 # -----------------------------------------------------------------------------
-cask "chromedriver"
 cask "github"
 cask "ngrok"
 cask "mitmproxy"
@@ -160,6 +152,8 @@ cask "mitmproxy"
 # -----------------------------------------------------------------------------
 cask "chatgpt"
 cask "claude"
+cask "codex"
+cask "linear-linear"
 cask "deepl"
 cask "obsidian"
 cask "raycast"
@@ -168,6 +162,7 @@ cask "raycast"
 # Casks - Communication
 # -----------------------------------------------------------------------------
 cask "discord"
+cask "gather"
 cask "slack"
 cask "zoom"
 
@@ -176,9 +171,15 @@ cask "zoom"
 # -----------------------------------------------------------------------------
 cask "1password"
 cask "1password-cli"
+cask "karabiner-elements"
+cask "smoothcsv"
 cask "clipy"
 cask "dockdoor"
 cask "figma"
 cask "jordanbaird-ice"
 cask "meetingbar"
-# cask "skitch"  # 利用不可
+
+# -----------------------------------------------------------------------------
+# Casks - Fonts
+# -----------------------------------------------------------------------------
+cask "font-jetbrains-mono-nerd-font"

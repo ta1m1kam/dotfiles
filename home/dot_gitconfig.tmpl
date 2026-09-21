@@ -3,8 +3,8 @@
 # =============================================================================
 
 [user]
-    name = {{ if hasKey . "name" }}{{ .name }}{{ else }}Your Name{{ end }}
-    email = {{ if hasKey . "email" }}{{ .email }}{{ else }}you@example.com{{ end }}
+    name = {{ .name }}
+    email = {{ .email }}
 
 [color]
     ui = true
@@ -24,16 +24,15 @@
 [commit]
     template = ~/.gitmessage.txt
 
+{{- /* CI には SSH 鍵がないので https のまま clone させる */}}
+{{- if not (env "CI") }}
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
-
-{{- if (and (hasKey . "work") .work) }}
-{{- /* Set WORK_GITHUB_ORG env var to rewrite https://github.com/<ORG>/ to ssh */}}
-{{- $org := env "WORK_GITHUB_ORG" }}
-{{- if $org }}
-[url "ssh://git@github.com/{{ $org }}/"]
-    insteadOf = https://github.com/{{ $org }}/
 {{- end }}
+
+{{- if and .work .work_github_org }}
+[url "ssh://git@github.com/{{ .work_github_org }}/"]
+    insteadOf = https://github.com/{{ .work_github_org }}/
 {{- end }}
 
 [filter "lfs"]

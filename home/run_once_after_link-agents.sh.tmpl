@@ -1,0 +1,4 @@
+#!/bin/bash
+# 初回 apply 時に ~/.agents を clone して skills を symlink する (再実行は mise run link-agents)
+[ -n "${CI:-}" ] && exit 0
+exec "{{ .chezmoi.homeDir }}/.config/dotfiles/link-agents"

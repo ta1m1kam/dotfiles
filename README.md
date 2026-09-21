@@ -2,294 +2,183 @@
 
 ![](https://github.com/ta1m1kam/dotfiles/workflows/macos/badge.svg)
 
-macOS用のdotfiles管理リポジトリ。chezmoi, mise, sheldon, starship, fzf, ghq, eza, delta などのモダンなCLIツールを活用した開発環境を構築します。
+macOS 用の dotfiles。chezmoi, mise, sheldon, starship, fzf, ghq, eza, delta などを使った開発環境を、新しい Mac にコマンド 1 つで再現します。
 
-## セットアップ
+## 新しい Mac のセットアップ
+
+クリーンインストール直後のターミナルで次を実行します。Xcode Command Line Tools、Homebrew、GitHub ログイン、SSH 鍵の作成と登録、dotfiles の適用までを対話しながら進めます。途中で失敗しても再実行できます。
 
 ```bash
-# 1. Homebrewインストール
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 2. dotfilesクローン
-git clone https://github.com/ta1m1kam/dotfiles.git ~/dotfiles
-
-# 3. （任意）work用環境変数を設定
-export WORK_MACHINE=1                    # 仕事用マシンの場合
-export WORK_GITHUB_ORG="your-org"        # 会社のGitHub Org（SSH書き換え対象）
-export OBSIDIAN_VAULT_DIR="$HOME/path/to/obsidian"
-export GIT_NAME="Your Name"
-export GIT_EMAIL="you@example.com"
-
-# 4. セットアップ実行
-cd ~/dotfiles
-brew install mise
-mise run install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ta1m1kam/dotfiles/master/bootstrap.sh)"
 ```
+
+`chezmoi init` で次の項目を一度だけ聞かれます。回答は `~/.config/chezmoi/chezmoi.toml` に保存されます。
+
+| 質問 | 内容 |
+|------|------|
+| Git user name / email | `~/.gitconfig` の user 設定 |
+| Is this a work machine | 仕事用マシンなら `y`。以下の work 用の質問が続く |
+| Work GitHub org | この org の https URL を ssh に書き換える |
+| Work main repo path | Raycast の「Selection to Claude Code」が worktree を作るリポジトリ |
+| 1Password account / vault | 仕事用 SSH 設定と Claude Code の OTEL 設定を読む 1Password の場所。空なら 1Password 連携をスキップ |
+| Obsidian vault directory | vault の clone 先 (既定 `~/Records`) |
+| Private agents repo | `~/.agents` に clone する非公開リポジトリ (skills 置き場)。空ならスキップ |
+
+### 1Password に置く秘密情報
+
+公開リポジトリには社内情報や秘密情報を置きません。work 用の設定は個人の 1Password から chezmoi の `onepasswordRead` で読み込みます。指定した vault に次のアイテムを用意します。
+
+| アイテム名 | 種類 | フィールド | 用途 |
+|-----------|------|-----------|------|
+| `dotfiles-ssh-config-work` | Secure Note | `notesPlain` | `~/.ssh/config` に追記する work 用の Host 定義 |
+| `dotfiles-claude-otel` | 任意 | `endpoint`, `headers` | Claude Code のテレメトリ送信先と `Authorization=Bearer ...` ヘッダ |
+
+1Password が未設定のマシンでは `~/.ssh/config` は chezmoi の管理対象外になり、既存ファイルを上書きしません。
+
+一度答えた質問は再度聞かれません (空で答えた場合も同じ)。後から変えるときは `~/.config/chezmoi/chezmoi.toml` の `[data]` を直接編集して `mise run apply` します。
+
+```toml
+[data]
+    onepassword_account = "my.1password.com"
+    onepassword_vault = "Personal"
+    agents_repo = "git@github.com:ta1m1kam/agents.git"
+```
+
+### bootstrap 後に手動でやること
+
+- 1Password アプリにログインし、CLI 連携を有効化してから `mise run apply`（work 用設定の反映）
+- bastion など GitHub 以外への新しい SSH 公開鍵の登録
+- Karabiner-Elements の入力監視とアクセシビリティの許可
+- Raycast にログイン（設定は Cloud Sync で復元）し、Script Commands のディレクトリに `~/.config/raycast/scripts` を追加
+- 古い Mac から `~/.local/share/atuin` を AirDrop でコピー（シェル履歴）
+- `mise run ghq-restore` で必要なリポジトリを clone（一覧は古い Mac で `mise run ghq-save`）
+- Homebrew 外のアプリ: Orca, Homerow, Shottr と App Store 系（Magnet, RunCat, Skitch, Xcode, Kindle）。会社の Jamf 配布アプリは自動で入る
+- 各アプリのログイン（Slack, Arc, Chrome, Claude, ChatGPT など）
 
 ## コマンド
 
 ```bash
-mise run install   # 初回セットアップ
-mise run apply     # dotfilesの適用
-mise run diff      # 差分確認
-mise run update    # ツールの更新
-mise run clean     # 旧バージョン管理ツールの削除
+mise run install       # 初回セットアップ (bootstrap.sh から呼ばれる。再実行可)
+mise run apply         # dotfiles の適用
+mise run diff          # 差分確認
+mise run update        # brew / mise / sheldon / dotfiles の更新
+mise run doctor        # シェルと主要ツールの動作確認
+mise run link-agents   # ~/.agents を clone し skills を symlink
+mise run ghq-save      # ghq の一覧を ~/.agents/ghq-list.txt に保存
+mise run ghq-restore   # 一覧から一括 clone
+mise run clean         # 旧バージョン管理ツールと不要 brew パッケージの削除
 ```
 
 ## ディレクトリ構成
 
 ```
 dotfiles/
-├── home/                    # chezmoi ソースディレクトリ
-│   ├── dot_zshrc            # → ~/.zshrc
-│   ├── dot_zprofile         # → ~/.zprofile
-│   ├── dot_vimrc            # → ~/.vimrc
-│   ├── dot_ideavimrc        # → ~/.ideavimrc
-│   ├── dot_gitconfig.tmpl   # → ~/.gitconfig (テンプレート)
-│   ├── dot_gitignore_global # → ~/.gitignore_global
-│   ├── dot_gitmessage.txt   # → ~/.gitmessage.txt
-│   ├── dot_tmux.conf        # → ~/.tmux.conf
-│   ├── dot_tigrc            # → ~/.tigrc
-│   └── dot_config/          # → ~/.config/
-│       ├── mise/config.toml  # 言語バージョン + npm グローバルパッケージ
-│       ├── sheldon/plugins.toml
-│       ├── starship.toml     # starship プロンプト設定
-│       ├── gwq/config.toml   # gwq (worktree manager) 設定
-│       └── zsh/functions/   # カスタム関数（分割管理）
-│           ├── ghq.zsh
-│           ├── fzf.zsh
-│           ├── git.zsh
-│           ├── worktree.zsh
-│           ├── docker.zsh
-│           ├── zoxide.zsh
-│           ├── atuin.zsh
-│           ├── tig.zsh
-│           ├── peco.zsh
-│           ├── yazi.zsh
-│           ├── just.zsh
-│           ├── procs.zsh
-│           ├── modern-cli.zsh
-│           ├── aqua.zsh
-│           └── custom.zsh
-├── .chezmoi.toml.tmpl       # chezmoi設定テンプレート
-├── .chezmoiroot             # ソースルート指定
-├── Brewfile                 # Homebrewパッケージ定義
-└── mise.toml                # mise tasks定義
+├── bootstrap.sh              # 新 Mac の最初の 1 コマンド
+├── Brewfile                  # Homebrew パッケージ定義 (formulae, casks, fonts)
+├── mise.toml                 # mise tasks 定義
+├── .chezmoiroot              # chezmoi ソースルート (home/)
+└── home/                     # chezmoi ソースディレクトリ
+    ├── .chezmoi.toml.tmpl    # chezmoi 設定 (初回 init で対話入力)
+    ├── .chezmoiignore.tmpl   # 管理対象外の指定
+    ├── dot_zshrc.tmpl        # → ~/.zshrc
+    ├── dot_zprofile          # → ~/.zprofile
+    ├── dot_gitconfig.tmpl    # → ~/.gitconfig
+    ├── dot_tmux.conf, dot_tigrc, dot_vimrc, dot_ideavimrc
+    ├── private_dot_ssh/config.tmpl        # Include + 1Password から work 用設定
+    ├── run_once_after_macos-defaults.sh   # macOS のシステム設定
+    ├── run_once_after_link-agents.sh.tmpl # ~/.agents の clone と symlink
+    ├── dot_config/dotfiles/executable_link-agents.tmpl
+    ├── dot_claude/           # Claude Code (hooks, commands, statusline, modify_settings.json.tmpl)
+    ├── dot_codex/            # Codex (AGENTS.md symlink, hooks symlink, modify_hooks.json.tmpl)
+    └── dot_config/
+        ├── mise/config.toml  # 言語ランタイムとグローバル CLI の宣言 (唯一の置き場)
+        ├── sheldon/plugins.toml
+        ├── starship.toml
+        ├── nvim/             # LazyVim (lazy-lock.json でバージョン固定)
+        ├── ghostty/, karabiner/, zed/, cmux/, borders/
+        ├── raycast/scripts/  # Raycast スクリプトコマンド
+        ├── claude/marketplaces/taiga-local/  # ローカルの Claude Code プラグイン
+        ├── gwq/, gh/, atuin/
+        └── zsh/functions/    # カスタム関数 (分割管理)
 ```
 
----
+## 管理方針
 
-## chezmoi の仕組み
+| 対象 | 置き場 |
+|------|--------|
+| 言語ランタイム・グローバル CLI (node, go, rust, python, ruby, claude-code, npm/go ツール) | mise (`~/.config/mise/config.toml`) |
+| GUI アプリ・CLI パッケージ・フォント | Brewfile |
+| プロジェクト固有の CLI | 各リポジトリの `aqua.yaml` / `mise.toml` |
+| 仕事固有の skills / zsh 関数 / ghq 一覧 | 非公開リポジトリ `~/.agents` (`skills/`, `zsh/`, `ghq-list.txt`) |
+| 秘密情報 (SSH の work 設定, OTEL トークン) | 個人の 1Password |
+| マシン固有のシェル設定 | `~/.zshrc.local` (chezmoi 管理外) |
+| VS Code / Cursor / Raycast 本体の設定 | 各アプリの同期機能 |
 
-このリポジトリは [chezmoi](https://www.chezmoi.io/) で dotfiles を管理しています。
+`~/.claude/settings.json` と `~/.codex/hooks.json` は丸ごと上書きせず、`modify_` スクリプトで dotfiles 管理のキーだけをマージします。Orca や auto mode が書き込む設定はそのまま残ります。
 
-### 基本的な流れ
+## chezmoi の使い方
 
 ```
-~/dotfiles/home/dot_zshrc    ソース（このリポジトリで編集）
-         │
+~/dotfiles/home/dot_zshrc.tmpl   ソース (このリポジトリで編集)
          │  chezmoi apply
          ▼
-~/.zshrc                     ターゲット（実際に使われるファイル）
+~/.zshrc                         ターゲット (実際に使われるファイル)
 ```
 
-**ソースディレクトリ**（`home/`）のファイルを編集し、`chezmoi apply` で実際の場所に適用します。
-
-### 命名規則
-
-chezmoi はファイル名のプレフィックス/サフィックスで動作を制御します。
-
-| 記法 | 意味 | 例 |
-|------|------|-----|
-| `dot_` | `.` で始まるファイル | `dot_zshrc` → `.zshrc` |
-| `private_` | パーミッション 600 | `private_ssh_config` → `ssh_config`（600） |
-| `.tmpl` | Go テンプレート | `dot_gitconfig.tmpl` → `.gitconfig` |
-| `exact_` | ディレクトリ内を完全同期 | 余分なファイルを削除 |
-| `run_` | スクリプトとして実行 | `run_setup.sh` → 適用時に実行 |
-
-### テンプレート変数
-
-`.tmpl` ファイルでは Go テンプレートが使えます。変数は `.chezmoi.toml.tmpl` で定義され、環境変数から読み込まれます：
-
-```toml
-[data]
-    name  = {{ env "GIT_NAME"  | default "Your Name"     | quote }}
-    email = {{ env "GIT_EMAIL" | default "you@example.com" | quote }}
-    work  = {{ if env "WORK_MACHINE" }}true{{ else }}false{{ end }}
-```
-
-| 環境変数 | 用途 |
-|---------|------|
-| `GIT_NAME` | git config の user.name |
-| `GIT_EMAIL` | git config の user.email |
-| `WORK_MACHINE` | `1` を設定すると仕事用マシン扱い（work flag が true に） |
-| `WORK_GITHUB_ORG` | `~/.gitconfig` で `https://github.com/<org>/` を ssh URL に書き換え対象 |
-| `OBSIDIAN_VAULT_DIR` | `yo`/`oo` 関数が参照する Obsidian vault のパス |
-
-テンプレート内での使用例：
-
-```
-[user]
-    name = {{ .name }}
-    email = {{ .email }}
-{{ if .work }}
-    signingkey = XXXXX
-{{ end }}
-```
-
-### よく使うコマンド
-
-| コマンド | 説明 |
-|---------|------|
-| `chezmoi diff` | 適用前に差分を確認 |
-| `chezmoi apply` | ソースをターゲットに適用 |
-| `chezmoi add ~/.zshrc` | 既存ファイルを chezmoi 管理下に追加 |
-| `chezmoi edit ~/.zshrc` | ソースファイルを編集 |
-| `chezmoi cd` | ソースディレクトリに移動 |
-| `chezmoi data` | テンプレート変数を確認 |
-| `chezmoi doctor` | 設定の問題を診断 |
-
-### 典型的なワークフロー
-
-#### 設定を変更する場合
+| 記法 | 意味 |
+|------|------|
+| `dot_` | `.` で始まるファイル |
+| `private_` | パーミッション 600 |
+| `executable_` | 実行権限を付ける |
+| `symlink_` | symlink を作る |
+| `modify_` | 既存ファイルを標準入力で受け取り、出力で置き換えるスクリプト |
+| `run_once_` / `run_onchange_` | 一度だけ / 内容が変わったときに実行するスクリプト |
+| `.tmpl` | Go テンプレート。`{{ .chezmoi.homeDir }}` や `chezmoi init` で答えた値が使える |
 
 ```bash
-# 1. ソースファイルを編集
-vim ~/dotfiles/home/dot_zshrc
+# 設定を変更する
+vim ~/dotfiles/home/dot_zshrc.tmpl
+mise run diff
+mise run apply
 
-# 2. 差分を確認
-chezmoi diff
+# 既存ファイルを管理下に追加する
+chezmoi add --source ~/dotfiles ~/.config/starship.toml
 
-# 3. 問題なければ適用
-chezmoi apply
-
-# 4. 変更をコミット
-cd ~/dotfiles
-git add -A && git commit -m "Update zshrc"
+# 別のマシンで同期する
+cd ~/dotfiles && git pull && mise run apply
 ```
-
-#### 新しいファイルを管理下に追加する場合
-
-```bash
-# 既存の設定ファイルを chezmoi に追加
-chezmoi add ~/.config/starship.toml
-
-# → home/dot_config/starship.toml が作成される
-```
-
-#### 別のマシンで同期する場合
-
-```bash
-# リポジトリを更新
-cd ~/dotfiles && git pull
-
-# 差分を確認して適用
-chezmoi diff
-chezmoi apply
-```
-
-### mise タスクとの対応
-
-このリポジトリでは mise でコマンドをラップしています：
-
-| mise コマンド | 実行内容 |
-|--------------|---------|
-| `mise run apply` | `chezmoi apply` |
-| `mise run diff` | `chezmoi diff` |
-| `mise run install` | Homebrew + chezmoi 初期化 |
-
-### mise での npm グローバルパッケージ管理
-
-mise は言語バージョンだけでなく、npm グローバルパッケージも管理できます。
-
-`~/.config/mise/config.toml`:
-
-```toml
-[tools]
-node = "lts"
-python = "3.12"
-ruby = "3.3"
-go = "latest"
-
-# npm global packages
-"npm:gitmoji-cli" = "latest"
-```
-
-npm パッケージを追加するには：
-
-```bash
-# config.toml に追加後
-mise install
-
-# 確認
-gitmoji --version
-```
-
----
 
 ## Zsh カスタムコマンド
 
-エイリアス、カスタム関数、キーバインドの詳細は **[docs/zsh-commands.md](docs/zsh-commands.md)** を参照してください。
+関数は `~/.config/zsh/functions/` に分割管理。詳細は [docs/zsh-commands.md](docs/zsh-commands.md)。
 
-### クイックリファレンス
-
-| キー | 説明 |
-|------|------|
-| `Ctrl+G` | ghq + roots + gwq + fzf でリポジトリ/worktree統合移動 |
-| `Ctrl+F` | fzf でファイル選択 → vim |
-| `Ctrl+B` | fzf で Git ブランチ切替 |
-| `Ctrl+]` | zoxide + fzf でディレクトリ移動 |
-| `Ctrl+H` | カレントディレクトリの履歴検索 |
-
-| コマンド | 説明 |
-|---------|------|
-| `gs` / `gd` / `ga` | git status / diff / add |
-| `gc` / `gp` / `gpl` | git commit / push / pull |
-| `gu` / `lg` | gitui / lazygit |
-| `gpr` / `gis` | fzf で PR/Issue 選択 |
-
----
+| コマンド | キー | 説明 |
+|---------|------|------|
+| `grepo` | Ctrl+G | ghq + gwq + fzf でリポジトリ / worktree に移動 |
+| `gwt` / `gwta` | - | worktree の選択 / 作成 |
+| `vf` | Ctrl+F | fzf でファイルを選んで nvim で開く |
+| `gb` | Ctrl+B | fzf でブランチ切り替え |
+| `zf` | Ctrl+] | zoxide + fzf でディレクトリ移動 |
+| `hd` | Ctrl+H | atuin でカレントディレクトリの履歴検索 |
+| `yy` | - | yazi 起動、終了時にディレクトリ移動 |
+| `jf` | - | just レシピを fzf で選択実行 |
+| `pk` | - | procs + fzf でプロセス kill |
+| `gu` / `lg` | - | gitui / lazygit |
+| `gpr` / `gprv` / `gis` | - | fzf で PR checkout / PR 表示 / Issue 表示 |
+| `tb` / `tl` / `ts` / `trf` | - | tig blame / log / stash / refs |
 
 ## 主要ツールスタック
 
-| カテゴリ | ツール | 用途 |
-|---------|--------|------|
-| dotfiles管理 | [chezmoi](https://www.chezmoi.io/) | テンプレート・暗号化対応 |
-| 言語バージョン管理 | [mise](https://mise.jdx.dev/) | Node.js, Python, Ruby, Go, npm グローバルパッケージ |
-| CLIバージョン管理 | [aqua](https://aquaproj.github.io/) | 宣言的なCLIツール管理（Node.js, pnpm 等） |
-| zshプラグイン管理 | [sheldon](https://sheldon.cli.rs/) | autosuggestions, syntax-highlighting |
-| プロンプト | [starship](https://starship.rs/) | 高速・最小設定のクロスシェルプロンプト |
-| ファジーファインダー | [fzf](https://github.com/junegunn/fzf) | ファイル検索、履歴検索 |
-| リポジトリ管理 | [ghq](https://github.com/x-motemen/ghq) | Git リポジトリの一元管理 |
-| プロジェクトroot抽出 | [roots](https://github.com/k1LoW/roots) | モノレポのサブパッケージを自動展開 |
-| worktree管理 | [gwq](https://github.com/d-kuro/gwq) | git worktree を ghq 風に管理 |
-| Git UI | [tig](https://github.com/jonas/tig), [gitui](https://github.com/extrawurst/gitui), [lazygit](https://github.com/jesseduffield/lazygit) | TUI ベースの Git 操作 |
-| Git diff | [delta](https://github.com/dandavison/delta) | side-by-side diff、行番号付き |
-| ls 代替 | [eza](https://github.com/eza-community/eza) | カラー表示・Git statusカラム付き |
-| 高速検索 | [ripgrep](https://github.com/BurntSushi/ripgrep) | 高速ファイル内検索 |
-| cat 代替 | [bat](https://github.com/sharkdp/bat) | シンタックスハイライト付き表示 |
-| cd 代替 | [zoxide](https://github.com/ajeetdsouza/zoxide) | スマートディレクトリ移動 |
-| 履歴管理 | [atuin](https://github.com/atuinsh/atuin) | シェル履歴の同期・検索 |
-
-### モダン CLI ツール
-
-| カテゴリ | ツール | 用途 |
-|---------|--------|------|
-| プロンプト | [starship](https://starship.rs/) | 高速・最小構成のクロスシェルプロンプト |
-| ls 代替 | [eza](https://github.com/eza-community/eza) | カラー + Gitステータス列付き |
-| git diff | [delta](https://github.com/dandavison/delta) | side-by-side diff、行番号付き |
-| プロジェクトroot抽出 | [roots](https://github.com/k1LoW/roots) | モノレポのサブパッケージを展開 |
-| worktree管理 | [gwq](https://github.com/d-kuro/gwq) | git worktree を ghq風に集中管理 |
-| ファイルマネージャー | [yazi](https://github.com/sxyazi/yazi) | 非同期・Vim風 TUI ファイルマネージャー |
-| Git TUI | [gitui](https://github.com/extrawurst/gitui) | 高速な Git TUI（Rust製、軽量） |
-| Git TUI | [lazygit](https://github.com/jesseduffield/lazygit) | 直感的な Git TUI（多機能） |
-| タスクランナー | [just](https://github.com/casey/just) | Makefile 代替のシンプルなタスクランナー |
-| ps 代替 | [procs](https://github.com/dalance/procs) | カラフルなプロセス表示、ツリービュー |
-| htop 代替 | [bottom](https://github.com/ClementTsang/bottom) | GPU対応システムモニター（`btm`） |
-| ベンチマーク | [hyperfine](https://github.com/sharkdp/hyperfine) | コマンドベンチマーク・統計分析 |
-| du 代替 | [dust](https://github.com/bootandy/dust) | ディスク使用量の可視化 |
-| sed 代替 | [sd](https://github.com/chmln/sd) | 直感的な検索・置換 |
-| curl 代替 | [xh](https://github.com/ducaale/xh) | モダンな HTTP クライアント |
-| 一括更新 | [topgrade](https://github.com/topgrade-rs/topgrade) | 全ツールを一括アップデート |
-
-各ツールの使い方・カスタム関数の詳細は **[docs/zsh-commands.md](docs/zsh-commands.md)** を参照してください。
+| カテゴリ | ツール |
+|---------|--------|
+| dotfiles 管理 | chezmoi |
+| ランタイム・CLI 管理 | mise |
+| zsh プラグイン | sheldon (zsh-defer, autosuggestions, syntax-highlighting, history-substring-search) |
+| プロンプト | starship |
+| ターミナル | Ghostty, cmux |
+| エディタ | Neovim (LazyVim), Zed, GoLand |
+| Git | gh, ghq, gwq, tig, gitui, lazygit, delta |
+| 検索・ナビゲーション | fzf, ripgrep, fd, zoxide, atuin |
+| モダン CLI | eza, bat, just, yazi, procs, bottom, hyperfine, dust, sd, xh, topgrade |
+| キーボード・ウィンドウ | Karabiner-Elements, borders, Raycast |
+| AI エージェント | Claude Code (mise), Codex (brew), agent-browser, defuddle |

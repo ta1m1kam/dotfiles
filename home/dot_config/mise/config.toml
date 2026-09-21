@@ -1,6 +1,7 @@
 # =============================================================================
 # mise configuration
 # https://mise.jdx.dev/configuration.html
+# 言語ランタイムとグローバル CLI はすべてここで宣言する
 # =============================================================================
 
 [settings]
@@ -12,7 +13,34 @@ plugin_autoupdate_last_check_duration = "7 days"
 verbose = false
 
 [tools]
+# 言語ランタイム
 node = "lts"
 python = "3.12"
 ruby = "3.3"
+go = "latest"
+rust = "stable"
+
+# パッケージマネージャ / ランタイム
+pnpm = "latest"
+uv = "latest"
+bun = "latest"
+
+# AI エージェント
+claude-code = "latest"
+
+# npm CLI
 "npm:defuddle" = "latest"
+"npm:agent-browser" = "latest"
+"npm:gitmoji-cli" = "latest"
+"npm:difit" = "latest"
+"npm:ntn" = "latest"
+
+# go CLI (汎用のみ。プロジェクト固有のものは各リポジトリで管理)
+"go:golang.org/x/tools/gopls" = "latest"
+"go:github.com/sivchari/gopls-lazy/cmd/gopls-lazy" = "latest"
+"go:github.com/go-delve/delve/cmd/dlv" = "latest"
+"go:golang.org/x/tools/cmd/goimports" = "latest"
+"go:honnef.co/go/tools/cmd/staticcheck" = "latest"
+"go:github.com/air-verse/air" = "latest"
+"go:go.uber.org/mock/mockgen" = "latest"
+"go:github.com/google/wire/cmd/wire" = "latest"

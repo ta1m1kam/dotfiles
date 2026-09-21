@@ -1,0 +1,30 @@
+#!/bin/bash
+# chezmoi modify script: Codex の hooks.json に自作 hook だけをマージし、Orca などのエントリは残す
+set -eu
+
+CURRENT="$(cat)"
+[ -z "$CURRENT" ] && CURRENT='{}'
+
+MANAGED="$(cat <<'JSON'
+{
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "startup", "hooks": [ { "type": "command", "command": "'{{ .chezmoi.homeDir }}/.codex/hooks/check-protected-branch.sh'" } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "'{{ .chezmoi.homeDir }}/.codex/hooks/notify-on-stop.sh'", "timeout": 10 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write", "hooks": [ { "type": "command", "command": "'{{ .chezmoi.homeDir }}/.codex/hooks/mo-preview.sh'", "timeout": 5 } ] }
+    ]
+  }
+}
+JSON
+)"
+
+printf '%s' "$CURRENT" | jq --argjson managed "$MANAGED" '
+  def ours: (.hooks // []) | any(.command | test("/\\.codex/hooks/"));
+  ((.hooks // {}) | with_entries(.value |= map(select(ours | not)))) as $kept
+  | ($managed.hooks | to_entries | reduce .[] as $e ($kept; .[$e.key] = ($e.value + (.[$e.key] // [])))) as $hooks
+  | .hooks = $hooks
+'

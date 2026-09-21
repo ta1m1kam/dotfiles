@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Selection to Claude Code
+# @raycast.mode silent
+
+# Optional parameters:
+# @raycast.icon 🕵️
+# @raycast.argument1 { "type": "text", "placeholder": "branch suffix (optional)", "optional": true }
+
+# Documentation:
+# @raycast.description 選択中のテキストを元に仕事リポジトリ (work_repo_dir) の worktree を作り、cmux の新セッションで Claude Code に原因調査・実装計画・実装をさせる
+# @raycast.author ta1m1kam
+# @raycast.authorURL https://raycast.com/ta1m1kam
+
+set -euo pipefail
+trap '' PIPE
+
+export CMUX_QUIET=1
+export PATH="$HOME/.local/share/mise/installs/node/lts/bin:$HOME/.local/share/mise/shims:$HOME/.local/share/aquaproj-aqua/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+
+REPO_DIR="{{ .work_repo_dir }}"
+[[ -n "$REPO_DIR" ]] || die "work_repo_dir が未設定です (chezmoi init で設定してください)"
+BASE_BRANCH="main"
+CMUX="/Applications/cmux.app/Contents/Resources/bin/cmux"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROMPT_TEMPLATE="$SCRIPT_DIR/selection-to-claude-prompt.md"
+
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+RUN_DIR="$HOME/.local/state/raycast-selection-to-claude/$TIMESTAMP"
+mkdir -p "$RUN_DIR"
+LOG="$RUN_DIR/run.log"
+exec 2>>"$LOG"
+
+# Raycast への出力は HUD 用。パイプが閉じていても落とさない
+say() {
+  echo "$1" || true
+}
+
+die() {
+  rollback
+  say "❌ $1"
+  say "   log: $LOG"
+  exit 1
+}
+
+# 途中で失敗したら作りかけの worktree / ブランチを巻き戻す
+BRANCH=""
+WT_PATH=""
+BRANCH_CREATED=0
+rollback() {
+  if [[ -n "$WT_PATH" ]]; then
+    git -C "$REPO_DIR" worktree remove --force "$WT_PATH" >/dev/null 2>&1 || true
+  fi
+  if [[ "$BRANCH_CREATED" == "1" ]]; then
+    git -C "$REPO_DIR" branch -D "$BRANCH" >/dev/null 2>&1 || true
+  fi
+}
+
+[[ -d "$REPO_DIR" ]] || die "リポジトリが見つかりません: $REPO_DIR"
+[[ -f "$PROMPT_TEMPLATE" ]] || die "プロンプトテンプレートが見つかりません: $PROMPT_TEMPLATE"
+[[ -x "$CMUX" ]] || die "cmux CLI が見つかりません: $CMUX"
+command -v gwq >/dev/null || die "gwq が見つかりません"
+command -v jq >/dev/null || die "jq が見つかりません"
+command -v claude >/dev/null || die "claude が見つかりません"
+
+# cmux は socketControlMode=cmuxOnly だと Raycast からの制御を拒否する
+"$CMUX" ping >/dev/null 2>>"$LOG" \
+  || die "cmux に接続できません。cmux.json の automation.socketControlMode を allowAll にしてください"
+
+# 選択テキストを Cmd+C で吸い上げる。クリップボードは元に戻す
+ORIGINAL_CLIP="$(pbpaste)"
+SENTINEL="__selection_to_claude_$$__"
+printf '%s' "$SENTINEL" | pbcopy
+sleep 0.3  # Raycast が閉じて元アプリにフォーカスが戻るのを待つ
+osascript -e 'tell application "System Events" to keystroke "c" using command down' >/dev/null 2>>"$LOG" || true
+
+INPUT_TEXT="$SENTINEL"
+for _ in $(seq 1 20); do
+  INPUT_TEXT="$(pbpaste)"
+  [[ "$INPUT_TEXT" != "$SENTINEL" ]] && break
+  sleep 0.1
+done
+
+if [[ "$INPUT_TEXT" == "$SENTINEL" ]]; then
+  printf '%s' "$ORIGINAL_CLIP" | pbcopy
+  die "選択テキストを取得できませんでした。テキストを選択した状態で実行してください (Raycast にアクセシビリティ権限が必要です)"
+fi
+printf '%s' "$ORIGINAL_CLIP" | pbcopy
+
+[[ -n "${INPUT_TEXT//[[:space:]]/}" ]] || die "選択テキストが空です"
+
+INPUT_FILE="$RUN_DIR/input.md"
+PROMPT_FILE="$RUN_DIR/prompt.md"
+printf '%s\n' "$INPUT_TEXT" > "$INPUT_FILE"
+
+SUFFIX="$(printf '%s' "${1:-}" | tr -cs 'A-Za-z0-9_-' '-' | sed 's/^-*//; s/-*$//')"
+BRANCH="sel/${TIMESTAMP}${SUFFIX:+-$SUFFIX}"
+
+git -C "$REPO_DIR" fetch origin "$BASE_BRANCH" >/dev/null 2>>"$LOG" || true
+if git -C "$REPO_DIR" show-ref --verify --quiet "refs/remotes/origin/$BASE_BRANCH"; then
+  git -C "$REPO_DIR" branch "$BRANCH" "origin/$BASE_BRANCH" >/dev/null 2>>"$LOG" || die "ブランチ作成に失敗しました: $BRANCH"
+else
+  git -C "$REPO_DIR" branch "$BRANCH" "$BASE_BRANCH" >/dev/null 2>>"$LOG" || die "ブランチ作成に失敗しました: $BRANCH"
+fi
+BRANCH_CREATED=1
+
+(cd "$REPO_DIR" && gwq add "$BRANCH" >/dev/null 2>>"$LOG") || die "worktree の作成に失敗しました: $BRANCH"
+
+WT_PATH="$(cd "$REPO_DIR" && gwq list --json 2>>"$LOG" | jq -r --arg b "$BRANCH" '.[] | select(.branch == $b) | .path' | head -1)"
+[[ -n "$WT_PATH" && -d "$WT_PATH" ]] || die "worktree のパスを解決できませんでした: $BRANCH"
+
+{
+  cat "$PROMPT_TEMPLATE"
+  printf '\n## 今回の入力\n\n'
+  printf -- '- 作業ブランチ: `%s` (base: `origin/%s`)\n' "$BRANCH" "$BASE_BRANCH"
+  printf -- '- worktree: `%s`\n\n' "$WT_PATH"
+  printf '### 共有されたテキスト\n\n'
+  printf '`````text\n'
+  cat "$INPUT_FILE"
+  printf '`````\n'
+} > "$PROMPT_FILE"
+
+"$CMUX" new-workspace \
+  --name "$BRANCH" \
+  --description "選択テキスト起票タスク ($BRANCH)" \
+  --cwd "$WT_PATH" \
+  --command "claude --permission-mode auto \"\$(cat '$PROMPT_FILE')\"" \
+  >/dev/null 2>>"$LOG" </dev/null \
+  || die "cmux ワークスペースの起動に失敗しました"
+
+say "🚀 $BRANCH"

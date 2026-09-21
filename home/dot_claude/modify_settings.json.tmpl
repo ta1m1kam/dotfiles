@@ -1,0 +1,124 @@
+#!/bin/bash
+# chezmoi modify script: 既存の settings.json に dotfiles 管理のキーだけをマージする
+# 他ツールが書き込むキー (Orca の hook, autoMode, env など) はそのまま残す
+set -eu
+
+CURRENT="$(cat)"
+[ -z "$CURRENT" ] && CURRENT='{}'
+
+MANAGED="$(cat <<'JSON'
+{
+{{- if and .work .onepassword_vault }}
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "{{ onepasswordRead (printf "op://%s/dotfiles-claude-otel/endpoint" .onepassword_vault) .onepassword_account }}",
+    "OTEL_EXPORTER_OTLP_HEADERS": "{{ onepasswordRead (printf "op://%s/dotfiles-claude-otel/headers" .onepassword_vault) .onepassword_account }}",
+    "OTEL_METRIC_EXPORT_INTERVAL": "60000",
+    "OTEL_LOGS_EXPORT_INTERVAL": "5000",
+    "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE": "delta"
+  },
+{{- end }}
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          { "type": "command", "command": "{{ .chezmoi.homeDir }}/.claude/hooks/check-protected-branch.sh" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{ .chezmoi.homeDir }}/.claude/hooks/notify-on-stop.sh", "timeout": 10 }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{ .chezmoi.homeDir }}/.claude/hooks/notify-on-notification.sh", "timeout": 10 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          { "type": "command", "command": "{{ .chezmoi.homeDir }}/.claude/hooks/mo-preview.sh", "timeout": 5 }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(rg:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(git restore:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr review:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(git rebase:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(sheldon:*)",
+      "Bash(chezmoi apply:*)",
+      "Bash(chezmoi init:*)",
+      "Bash(chezmoi diff:*)",
+      "Bash(cat:*)",
+      "Bash(git worktree:*)",
+      "Bash(tmux:*)"
+    ],
+    "deny": [],
+    "defaultMode": "auto"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": false,
+    "example-skills@anthropic-agent-skills": true,
+    "feature-dev@claude-plugins-official": true,
+    "gopls-lazy-lsp@taiga-local": true,
+    "eli5@claude-community": true,
+    "codex@openai-codex": true,
+    "typesafe@typesafe-ai": true
+  },
+  "extraKnownMarketplaces": {
+    "taiga-local": { "source": { "source": "directory", "path": "{{ .chezmoi.homeDir }}/.config/claude/marketplaces/taiga-local" } },
+    "genshijin": { "source": { "source": "github", "repo": "InterfaceX-co-jp/genshijin" } },
+    "claude-community": { "source": { "source": "github", "repo": "anthropics/claude-plugins-community" } },
+    "openai-codex": { "source": { "source": "github", "repo": "openai/codex-plugin-cc" } },
+    "typesafe-ai": { "source": { "source": "github", "repo": "typesafe-ai/skills" } }
+  },
+  "model": "claude-fable-5-1[1m]",
+  "advisorModel": "fable",
+  "plansDirectory": "./z",
+  "theme": "dark",
+  "editorMode": "vim",
+  "preferredNotifChannel": "ghostty",
+  "agentPushNotifEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "skipAutoPermissionPrompt": true
+}
+JSON
+)"
+
+# hooks は「自作 hook (~/.claude/hooks/) を指す既存エントリ」だけ差し替え、他ツールのエントリは残す
+printf '%s' "$CURRENT" | jq --argjson managed "$MANAGED" '
+  def ours: (.hooks // []) | any(.command | test("/\\.claude/hooks/"));
+  ((.hooks // {}) | with_entries(.value |= map(select(ours | not)))) as $kept
+  | ($managed.hooks | to_entries | reduce .[] as $e ($kept; .[$e.key] = ($e.value + (.[$e.key] // [])))) as $hooks
+  | . * ($managed | del(.hooks))
+  | .hooks = $hooks
+'

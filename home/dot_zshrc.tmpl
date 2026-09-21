@@ -1,0 +1,241 @@
+# =============================================================================
+# .zshrc - Zsh Configuration
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# PATH (must be set before other tools)
+# -----------------------------------------------------------------------------
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# -----------------------------------------------------------------------------
+# aqua (プロジェクト側の aqua.yaml でインストールされる CLI の PATH)
+# -----------------------------------------------------------------------------
+export PATH="$PATH:${AQUA_ROOT_DIR:-$HOME/.local/share/aquaproj-aqua}/bin"
+
+# -----------------------------------------------------------------------------
+# sheldon (plugin manager)
+# -----------------------------------------------------------------------------
+eval "$(sheldon source)"
+
+# -----------------------------------------------------------------------------
+# starship prompt
+# -----------------------------------------------------------------------------
+eval "$(starship init zsh)"
+
+# -----------------------------------------------------------------------------
+# Environment
+# -----------------------------------------------------------------------------
+export LC_CTYPE=UTF-8
+export EDITOR=vim
+export OBSIDIAN_VAULT_DIR="{{ .obsidian_vault_dir }}"
+
+# -----------------------------------------------------------------------------
+# Completion
+# -----------------------------------------------------------------------------
+autoload -U compinit; compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' ignore-parents parent pwd ..
+zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
+
+# -----------------------------------------------------------------------------
+# Options
+# -----------------------------------------------------------------------------
+setopt auto_cd
+setopt correct
+setopt nolistbeep
+setopt auto_pushd
+setopt hist_ignore_dups
+setopt hist_ignore_all_dups
+setopt append_history
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+setopt extended_glob
+setopt print_eight_bit
+
+# -----------------------------------------------------------------------------
+# History
+# -----------------------------------------------------------------------------
+HISTFILE=~/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+
+# -----------------------------------------------------------------------------
+# mise (runtime version manager)
+# -----------------------------------------------------------------------------
+eval "$(mise activate zsh)"
+
+# -----------------------------------------------------------------------------
+# direnv
+# -----------------------------------------------------------------------------
+eval "$(direnv hook zsh)"
+
+# -----------------------------------------------------------------------------
+# zoxide (smart cd)
+# -----------------------------------------------------------------------------
+eval "$(zoxide init zsh)"
+
+# -----------------------------------------------------------------------------
+# atuin (shell history)
+# -----------------------------------------------------------------------------
+eval "$(atuin init zsh)"
+
+# -----------------------------------------------------------------------------
+# fzf configuration
+# -----------------------------------------------------------------------------
+export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
+export FZF_DEFAULT_OPTS='
+  --height 60%
+  --border rounded
+  --layout reverse
+  --preview-window right:50%
+  --bind ctrl-u:preview-half-page-up
+  --bind ctrl-d:preview-half-page-down
+  --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8
+  --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc
+  --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8
+'
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range :500 {}'"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# -----------------------------------------------------------------------------
+# bat configuration
+# -----------------------------------------------------------------------------
+export BAT_THEME="Catppuccin Mocha"
+
+# -----------------------------------------------------------------------------
+# Go
+# -----------------------------------------------------------------------------
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+# -----------------------------------------------------------------------------
+# PATH (additional)
+# -----------------------------------------------------------------------------
+export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
+
+# =============================================================================
+# Aliases
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Directory navigation
+# -----------------------------------------------------------------------------
+alias d='cd ~/Desktop'
+alias dotfiles='cd ~/dotfiles'
+alias W='cd ~/workspace'
+
+# -----------------------------------------------------------------------------
+# File operations
+# -----------------------------------------------------------------------------
+alias c='clear'
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+alias ..='cd ..'
+alias ls='eza --git'
+alias la='eza -la --git'
+alias ll='eza -l --git'
+alias lt='eza --tree --level=2 --git-ignore'
+alias tree='eza --tree --git-ignore'
+alias mkdir='mkdir -p'
+alias cat='bat'
+
+# -----------------------------------------------------------------------------
+# Editor
+# -----------------------------------------------------------------------------
+alias vi='nvim'
+alias vim='nvim'
+alias f='open .'
+alias od='open ~/Desktop'
+
+# GoLand: open -a "GoLand" のショートカット
+function goland() {
+  open -a "GoLand" "${1:-.}"
+}
+
+# -----------------------------------------------------------------------------
+# Git
+# -----------------------------------------------------------------------------
+alias gs='git status'
+alias gd='git diff'
+alias ga='git add'
+alias gaa='git add -A'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gp='git push'
+alias gpl='git pull'
+alias gco='git checkout'
+alias gl='git log --oneline -20'
+alias gst='git stash'
+alias gm='gitmoji -c'
+
+# -----------------------------------------------------------------------------
+# Git TUI
+# -----------------------------------------------------------------------------
+alias gu='gitui'
+alias lg='lazygit'
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+alias dc='docker-compose'
+
+# -----------------------------------------------------------------------------
+# Tmux
+# -----------------------------------------------------------------------------
+alias t='tmux'
+
+# -----------------------------------------------------------------------------
+# Reload
+# -----------------------------------------------------------------------------
+alias zshrc='source ~/.zshrc'
+
+# -----------------------------------------------------------------------------
+# Global alias
+# -----------------------------------------------------------------------------
+alias -g G='| grep'
+
+# =============================================================================
+# Functions (loaded from ~/.config/zsh/functions/)
+# =============================================================================
+for f in ~/.config/zsh/functions/*.zsh(N); do
+  source "$f"
+done
+# 非公開リポジトリ (~/.agents) 側の関数
+for f in ~/.agents/zsh/*.zsh(N); do
+  source "$f"
+done
+
+# =============================================================================
+# Key bindings
+# =============================================================================
+
+# Ctrl+G: ghq + roots + fzf でリポジトリ移動
+bindkey -s '^g' 'grepo\n'
+
+# Ctrl+F: fzf でファイル検索
+bindkey -s '^f' 'vf\n'
+
+# Ctrl+B: fzf でブランチ切り替え
+bindkey -s '^b' 'gb\n'
+
+# Ctrl+]: zoxide でディレクトリ検索
+bindkey -s '^]' 'zf\n'
+
+# Ctrl+H: カレントディレクトリの履歴検索
+bindkey -s '^h' 'hd\n'
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# =============================================================================
+# Local overrides (machine-specific, not managed by chezmoi)
+# =============================================================================
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

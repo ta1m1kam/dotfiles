@@ -1,58 +1,25 @@
 # AGENTS.md
 
-このファイルはコーディングエージェント全体に共通する指示をまとめたものです。
-Claude Code, Codex CLI, その他エージェントから参照されることを想定しています。
-
-## Conversation Guidelines
+## 会話
 
 - 常に日本語で会話する
+- 実装や計画で迷ったら、進める前にユーザーに質問する
 
-## Protected Branch Warning
+## コード
 
-- **セッション開始時に「保護されたブランチで作業中」という警告がコンテキストに含まれている場合、最初の応答で必ずユーザーに警告すること**
-- main, develop, master ブランチで直接作業することは推奨されない
-- 警告を検知したら、以下のようにユーザーに提案すること：
-  - 「⚠️ 保護されたブランチで作業中です。worktreeで別ブランチを作成しますか？」
-  - `gwta` コマンドで新規worktree作成を提案
-  - `gwt` コマンドで既存worktree選択を提案
+- コメントに頼らず、読めばわかる可読性の高いコードを書く
+- どうしても必要なコメントは複数行にせず、1行で簡潔に書く
+- 暫定対処ではなく根本原因を直す
+- 変更は必要な箇所に限定する
+- 完了と報告する前に、テスト実行やログ確認で動作を確かめる
 
-## Editorconfig
+## Git
 
-- **必ず** insert_final_newline = true を守る（すべてのファイルの最終行には必ず改行を入れる）
-- trim_trailing_whitespace = true
-- これらのルールは例外なく全てのファイル編集時に適用すること
+- 日本語でコミットする
+- コミットメッセージの下に利用したプロンプトを `prompt: ` から始めて書く
 
-## Git Commit
+## ツール
 
-- 日本語でコミットしてください
-- コミットメッセージの下に利用したプロンプトを `prompt: ` から始めて書いてください
-
-## Development Philosophy
-
-### Coding Guidelines
-
-- 余計な自明なコードコメントは残さない
-
-### Test-Driven Development (TDD)
-
-- 原則としてテスト駆動開発（TDD）で進める
-- 期待される入出力に基づき、まずテストを作成する
-- 実装コードは書かず、テストのみを用意する
-- テストを実行し、失敗を確認する
-- テストが正しいことを確認できた段階でコミットする
-- その後、テストをパスさせる実装を進める
-- 実装中はテストを変更せず、コードを修正し続ける
-- すべてのテストが通過するまで繰り返す
-
-## Decision Making
-
-- 不明点があれば実装する前に質問してください。計画や実装で迷うときはユーザーに質問しなさい
-  - 積極的に `confirm_details` ツールを利用して
-
-## Web Fetch
-
-- URL から本文・記事コンテンツを取得する際は、組み込みの WebFetch ではなく [`defuddle`](https://github.com/kepano/defuddle) CLI を Bash 経由で使うこと
-  - 例: `defuddle parse <url> --markdown`
-  - JSON でメタデータも欲しいときは `defuddle parse <url> --json`
-- defuddle は記事抽出に最適化されているため、ニュース記事・ブログ・ドキュメントの読み取りで優先する
-- HTML の細部や DOM 構造そのものを確認したい場合のみ WebFetch / curl を使う
+- URL から本文を取得するときは WebFetch ではなく `defuddle` CLI を Bash 経由で使う
+  - `defuddle parse <url> --markdown` / メタデータも欲しいときは `--json`
+  - DOM 構造そのものを見たいときのみ WebFetch / curl

@@ -9,42 +9,43 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install mise
         uses: jdx/mise-action@v2
+        with:
+          install: false
 
       - name: Install Homebrew packages
         run: brew bundle --file=Brewfile
 
-      - name: Apply dotfiles with chezmoi
+      - name: Apply dotfiles with chezmoi (non-interactive)
         run: |
-          chezmoi init --source $PWD --apply
-
-      - name: Verify sheldon
-        run: sheldon --version
+          chezmoi init --source "$PWD" --apply \
+            --promptString "Git user name=CI" \
+            --promptString "Git email=ci@example.com" \
+            --promptBool "Is this a work machine (y/n)=false" \
+            --promptString "Obsidian vault directory=$HOME/Records" \
+            --promptString "Private agents repo cloned to ~/.agents (git URL, empty to skip)="
 
       - name: Install mise tools
-        run: mise install
+        run: mise install --yes
+
+      - name: Smoke test the shell
+        run: |
+          sheldon lock --update
+          zsh -ilc 'echo "interactive zsh ok"; whence -w tr trf grepo gwt | cat'
 
       - name: Verify setup
         run: |
-          echo "==> Checking chezmoi..."
-          chezmoi --version
-          ls -la ~/.zshrc ~/.vimrc ~/.gitconfig ~/.tmux.conf ~/.tigrc
-
-          echo "==> Checking mise..."
-          mise --version
-          mise list
-
-          echo "==> Checking sheldon..."
-          sheldon --version
-
-          echo "==> Checking installed tools..."
-          which fzf && fzf --version
-          which rg && rg --version
-          which bat && bat --version
-          which ghq && ghq --version
-          which tig && tig --version
+          chezmoi --version && mise --version && sheldon --version
+          ls -la ~/.zshrc ~/.zprofile ~/.gitconfig ~/.tmux.conf ~/.tigrc ~/.config/ghostty/config ~/.config/karabiner/karabiner.json
+          test -f ~/.claude/settings.json && jq -e '.permissions.defaultMode == "auto"' ~/.claude/settings.json
+          test -L ~/.codex/hooks/mo-preview.sh
+          for c in fzf rg bat ghq gwq tig eza starship atuin zoxide nvim claude gitmoji; do
+            command -v "$c" >/dev/null || { echo "missing: $c"; exit 1; }
+          done

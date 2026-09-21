@@ -1,0 +1,32 @@
+#!/bin/bash
+# ~/.agents (非公開リポジトリ) を clone し、skills を Claude Code / Codex に symlink する
+set -eu
+
+AGENTS_REPO="{{ .agents_repo }}"
+AGENTS_DIR="$HOME/.agents"
+
+if [ -z "$AGENTS_REPO" ]; then
+  echo "[link-agents] agents_repo is not set, skip"
+  exit 0
+fi
+if [ ! -d "$AGENTS_DIR/.git" ]; then
+  git clone "$AGENTS_REPO" "$AGENTS_DIR"
+fi
+
+link_skills() {
+  local dst="$1"
+  mkdir -p "$dst"
+  for src in "$AGENTS_DIR"/skills/*/; do
+    src="${src%/}"
+    local name; name="$(basename "$src")"
+    if [ -e "$dst/$name" ] && [ ! -L "$dst/$name" ]; then
+      echo "[link-agents] skip: $dst/$name exists and is not a symlink"
+      continue
+    fi
+    ln -sfn "$src" "$dst/$name"
+  done
+}
+
+link_skills "$HOME/.claude/skills"
+link_skills "$HOME/.codex/skills"
+echo "[link-agents] done"
