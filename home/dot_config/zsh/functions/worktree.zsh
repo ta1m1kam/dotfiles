@@ -30,21 +30,44 @@ function _gwt_main_branch() {
   fi
 }
 
+# Pick a worktree path via fzf using gwq's JSON output.
+# Pass extra fzf args ("$@") through (e.g. -m for multi-select).
+# Output: one absolute path per line on stdout.
+# Columns: 1=worktree name (basename), 2=branch, 3=path (hidden, used for cd)
+function _gwt_pick_path() {
+  gwq list --json 2>/dev/null \
+    | jq -r '.[] | "\(.path | split("/") | last)\t\(.branch)\t\(.path)"' \
+    | fzf "$@" \
+        --with-nth=1,2 \
+        --delimiter=$'\t' \
+        --preview '
+          path=$(printf "%s" {} | cut -f3)
+          cd "$path" 2>/dev/null && {
+            echo "Worktree: $(basename "$path")"
+            echo "Branch: $(git branch --show-current)"
+            echo "Latest: $(git log -1 --format="%h %s")"
+            echo "---"
+            git status -s | head -20
+          }
+        ' \
+    | cut -f3
+}
+
+# Resolve the worktree path of a given branch via gwq's JSON output.
+function _gwt_path_for_branch() {
+  local branch="$1"
+  gwq list --json 2>/dev/null \
+    | jq -r --arg b "$branch" '.[] | select(.branch == $b) | .path' \
+    | head -1
+}
+
 # -----------------------------------------------------------------------------
 # Basic operations
 # -----------------------------------------------------------------------------
 
 function gwt() {
   local worktree
-  worktree=$(gwq list -g 2>/dev/null | \
-    fzf --preview '
-      cd {} 2>/dev/null && {
-        echo "Branch: $(git branch --show-current)"
-        echo "Latest: $(git log -1 --format="%h %s")"
-        echo "---"
-        git status -s | head -20
-      }
-    ')
+  worktree=$(_gwt_pick_path)
   if [[ -n "$worktree" ]]; then
     cd "$worktree"
     zoxide add "$worktree"
@@ -71,13 +94,13 @@ function gwta() {
 
   if [[ -z "$branch_name" ]]; then
     gwq add "$base_branch"
-    wt_path=$(gwq list -g 2>/dev/null | grep "=${base_branch##*/}$" | head -1)
+    wt_path=$(_gwt_path_for_branch "$base_branch")
   else
     git fetch origin "$base_branch" 2>/dev/null || true
     git branch "$branch_name" "origin/${base_branch}" 2>/dev/null || \
       git branch "$branch_name" "$base_branch"
     gwq add "$branch_name"
-    wt_path=$(gwq list -g 2>/dev/null | grep "=${branch_name//\//-}$" | head -1)
+    wt_path=$(_gwt_path_for_branch "$branch_name")
   fi
 
   if [[ -n "$wt_path" ]]; then
@@ -88,16 +111,21 @@ function gwta() {
 
 function gwtr() {
   local worktree
-  worktree=$(gwq list -g 2>/dev/null | \
-    fzf -m --preview '
-      cd {} 2>/dev/null && {
-        echo "This worktree will be removed"
-        echo "---"
-        echo "Branch: $(git branch --show-current)"
-        echo "Uncommitted changes:"
-        git status -s
-      }
-    ')
+  worktree=$(gwq list --json 2>/dev/null \
+    | jq -r '.[] | "\(.path | split("/") | last)\t\(.branch)\t\(.path)"' \
+    | fzf -m --with-nth=1,2 --delimiter=$'\t' \
+        --preview '
+          path=$(printf "%s" {} | cut -f3)
+          cd "$path" 2>/dev/null && {
+            echo "This worktree will be removed"
+            echo "---"
+            echo "Worktree: $(basename "$path")"
+            echo "Branch: $(git branch --show-current)"
+            echo "Uncommitted changes:"
+            git status -s
+          }
+        ' \
+    | cut -f3)
 
   if [[ -n "$worktree" ]]; then
     echo "$worktree" | while read -r dir; do
@@ -244,20 +272,25 @@ function gwtt() {
 
 function gwtc() {
   local worktree
-  worktree=$(gwq list -g 2>/dev/null | \
-    fzf --preview '
-      cd {} 2>/dev/null && {
-        echo "Claude Code workspace"
-        echo "---"
-        echo "Branch: $(git branch --show-current)"
-        echo "Latest: $(git log -1 --format="%h %s")"
-        echo ""
-        if [[ -f "CLAUDE.md" ]]; then
-          echo "[CLAUDE.md found]"
-          head -20 CLAUDE.md
-        fi
-      }
-    ')
+  worktree=$(gwq list --json 2>/dev/null \
+    | jq -r '.[] | "\(.path | split("/") | last)\t\(.branch)\t\(.path)"' \
+    | fzf --with-nth=1,2 --delimiter=$'\t' \
+        --preview '
+          path=$(printf "%s" {} | cut -f3)
+          cd "$path" 2>/dev/null && {
+            echo "Claude Code workspace"
+            echo "---"
+            echo "Worktree: $(basename "$path")"
+            echo "Branch: $(git branch --show-current)"
+            echo "Latest: $(git log -1 --format="%h %s")"
+            echo ""
+            if [[ -f "CLAUDE.md" ]]; then
+              echo "[CLAUDE.md found]"
+              head -20 CLAUDE.md
+            fi
+          }
+        ' \
+    | cut -f3)
 
   if [[ -n "$worktree" ]]; then
     cd "$worktree"
@@ -284,7 +317,7 @@ function gwtcn() {
   [[ -z "$base_branch" ]] && base_branch=$(_gwt_main_branch)
 
   gwq add -b "$branch_name" "$base_branch"
-  wt_path=$(gwq list -g 2>/dev/null | grep "=${branch_name//\//-}$" | head -1)
+  wt_path=$(_gwt_path_for_branch "$branch_name")
 
   if [[ -n "$wt_path" ]]; then
     cd "$wt_path"
