@@ -52,7 +52,7 @@ macOS 用の dotfiles。chezmoi, mise, sheldon, starship, fzf, ghq, eza, delta �
 - Raycast にログイン（設定は Cloud Sync で復元）し、Script Commands のディレクトリに `~/.config/raycast/scripts` を追加
 - 古い Mac から `~/.local/share/atuin` を AirDrop でコピー（シェル履歴）
 - `mise run ghq-restore` で必要なリポジトリを clone（一覧は古い Mac で `mise run ghq-save`）
-- Homebrew 外のアプリ: Orca, Homerow, Shottr と App Store 系（Magnet, RunCat, Skitch, Xcode, Kindle）。会社の Jamf 配布アプリは自動で入る
+- Homebrew 外のアプリ: Orca, Homerow, Shottr と App Store 系（Magnet, RunCat, Skitch, Xcode, Kindle）。Google Chrome / Slack / Zoom を含む会社の Jamf 配布アプリは自動で入る（個人 Mac なら `brew install --cask google-chrome slack zoom`）
 - 各アプリのログイン（Slack, Arc, Chrome, Claude, ChatGPT など）
 
 ## コマンド
