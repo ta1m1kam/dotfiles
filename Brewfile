@@ -5,9 +5,10 @@
 # -----------------------------------------------------------------------------
 # Taps
 # -----------------------------------------------------------------------------
-tap "k1low/tap"
-tap "d-kuro/tap"
-tap "felixkratz/formulae"
+# Homebrew 7 以降、非公式 tap は trusted 指定がないと読み込まれない
+tap "k1low/tap", trusted: true
+tap "d-kuro/tap", trusted: true
+tap "felixkratz/formulae", trusted: true
 # tap "homebrew/bundle"  # deprecated
 # tap "koekeishiya/formulae"  # yabai (CI環境で利用不可)
 
@@ -142,7 +143,6 @@ cask "sequel-ace"
 # -----------------------------------------------------------------------------
 # Casks - Development Tools
 # -----------------------------------------------------------------------------
-cask "chromedriver"
 cask "github"
 cask "ngrok"
 cask "mitmproxy"
