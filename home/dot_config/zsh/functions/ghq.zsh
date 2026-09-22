@@ -4,7 +4,7 @@
 # モノレポのサブパッケージにも直接移動できる
 function grepo() {
   local dir
-  dir=$({ ghq list --full-path | roots; gwq list -g 2>/dev/null } | sort -u | \
+  dir=$({ ghq list --full-path | roots; gwq list -g --json 2>/dev/null | jq -r ".[].path" } | sort -u | \
     fzf --height 40% \
         --preview 'bat --color=always --style=header,grid --line-range :80 {}/README.md 2>/dev/null || ls -la {}')
   [[ -n "$dir" ]] && cd "$dir"
