@@ -178,6 +178,7 @@ cask "dockdoor"
 cask "figma"
 cask "jordanbaird-ice"
 cask "meetingbar"
+cask "google-japanese-ime"
 
 # -----------------------------------------------------------------------------
 # Casks - Fonts
